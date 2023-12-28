@@ -82,3 +82,18 @@ INSERT INTO [example-db].dbo.Courses
     ('POT-101-23', 'Potions - 101; ''23', 1, '2023-2'),
     ('TLP-201-23', 'Telepathy, Advanced; ''23', 2, '2023-2')
 ;
+
+--Students
+
+CREATE TABLE [example-db].dbo.StudentCourses (
+    StudentId INT,
+    CourseId varchar(20),
+    PRIMARY KEY (StudentId, CourseId),
+    FOREIGN KEY (StudentId) REFERENCES Students(Id),
+    FOREIGN KEY (CourseId) REFERENCES Courses(Id)
+);
+
+INSERT INTO [example-db].dbo.StudentCourses
+  VALUES
+    (1, 'POT-101-23')
+;

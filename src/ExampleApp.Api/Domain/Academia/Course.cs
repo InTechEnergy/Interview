@@ -1,3 +1,5 @@
+using ExampleApp.Api.Domain.Students;
+
 namespace ExampleApp.Api.Domain.Academia;
 
 internal class Course : AggregateRoot<string>
@@ -31,6 +33,7 @@ internal class Course : AggregateRoot<string>
     public string Description { get; init; }
     public Semester Semester { get; protected init; }
     public Professor Professor { get; protected set; }
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
 
     public void UpdateProfessor(Professor newProfessor)
     {
