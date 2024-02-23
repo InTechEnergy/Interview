@@ -10,12 +10,29 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+var a = config.GetConnectionString("Default");
 builder.Services.AddDbContext<AcademiaDbContext>(
     opt => opt.UseSqlServer(config.GetConnectionString("Default")));
 builder.Services.AddMediatR(
     cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 var app = builder.Build();
+
+// Ensure the database is created.
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AcademiaDbContext>();
+        context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

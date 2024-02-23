@@ -33,4 +33,12 @@ internal class AcademiaDbContext : DbContext
             .HaveConversion<DateOnlyConverter>()
             .HaveColumnType("date");
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Data Source=(localdb)\\localdev;Initial Catalog=example-db;Trusted_Connection=True;Integrated Security=True;TrustServerCertificate=true");
+        }
+    }
 }
