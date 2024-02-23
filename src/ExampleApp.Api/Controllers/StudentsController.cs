@@ -33,7 +33,7 @@ public class StudentsController : ControllerBase
         {
             //KeyNameModel semesterModel = new KeyNameModel(student.Semester.Id, student.Semester.Description);
             //KeyNameModel professorModel = new KeyNameModel(student.Professor.Id.ToString(), student.Professor.FullName);
-            StudentModel courseModel = new(student.Id, student.FullName, student.Badge);
+            StudentModel courseModel = new(student.Id, student.FullName, student.Badge, student.StudentCourses?.Count ?? 0);
 
             models.Add(courseModel);
         }
