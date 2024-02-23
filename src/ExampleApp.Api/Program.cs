@@ -10,9 +10,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var a = config.GetConnectionString("Default");
 builder.Services.AddDbContext<AcademiaDbContext>(
-    opt => opt.UseSqlServer(config.GetConnectionString("Default")));
+    opt => opt.UseSqlServer(
+        config.GetConnectionString("Default"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 builder.Services.AddMediatR(
     cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
@@ -48,3 +55,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
