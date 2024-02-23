@@ -27,12 +27,14 @@ public class CoursesController : ControllerBase
         ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        List <CourseModel> models = new();
+        List<CourseModel> models = new();
+
         foreach (var course in courses)
         {
-            var semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);
-            var professorModel = new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName);
+            KeyNameModel semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);
+            KeyNameModel professorModel = new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName);
             CourseModel courseModel = new(course.Id, course.Description, semesterModel, professorModel);
+
             models.Add(courseModel);
         }
 
