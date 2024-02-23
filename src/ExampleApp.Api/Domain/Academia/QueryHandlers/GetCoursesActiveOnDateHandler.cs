@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using ExampleApp.Api.Domain.Academia.Queries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +15,10 @@ internal class GetCoursesActiveOnDateHandler : IRequestHandler<GetCoursesActiveO
 
     public async Task<ICollection<Course>> Handle(GetCoursesActiveOnDateQuery request, CancellationToken cancellationToken)
     {
-        var courses = await _context.Courses
+        return await _context.Courses
             .Where(c => c.Semester.Start <= request.ActiveOn && request.ActiveOn <= c.Semester.End)
             .Include(c => c.Semester)
             .Include(c => c.Professor)
             .ToListAsync(cancellationToken: cancellationToken);
-        return courses;
     }
 }

@@ -1,3 +1,4 @@
+using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,16 +13,18 @@ internal class AcademiaDbContext : DbContext
     internal DbSet<Course> Courses { get; set; }
     internal DbSet<Professor> Professors { get; set; }
     internal DbSet<Semester> Semesters { get; set; }
+    internal DbSet<Student> Students { get; set; }
+    internal DbSet<StudentCourse> StudentCourses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Semester>(
+        _ = builder.Entity<Semester>(
             e =>
             {
-                e.Property(x => x.Start).HasColumnName("StartDate");
-                e.Property(x => x.End).HasColumnName("EndDate");
+                _ = e.Property(x => x.Start).HasColumnName("StartDate");
+                _ = e.Property(x => x.End).HasColumnName("EndDate");
             });
     }
 
@@ -29,7 +32,7 @@ internal class AcademiaDbContext : DbContext
     {
         base.ConfigureConventions(builder);
 
-        builder.Properties<DateOnly>()
+        _ = builder.Properties<DateOnly>()
             .HaveConversion<DateOnlyConverter>()
             .HaveColumnType("date");
     }

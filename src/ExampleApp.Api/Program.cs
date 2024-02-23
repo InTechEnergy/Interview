@@ -15,7 +15,7 @@ builder.Services.AddDbContext<AcademiaDbContext>(
         config.GetConnectionString("Default"),
         sqlServerOptionsAction: sqlOptions =>
         {
-            sqlOptions.EnableRetryOnFailure(
+            _ = sqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 3,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
@@ -32,7 +32,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AcademiaDbContext>();
-        context.Database.EnsureCreated();
+        _ = context.Database.EnsureCreated();
     }
     catch (Exception ex)
     {
@@ -44,8 +44,8 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    _ = app.UseSwagger();
+    _ = app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

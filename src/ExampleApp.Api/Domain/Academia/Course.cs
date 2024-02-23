@@ -1,3 +1,5 @@
+using ExampleApp.Api.Domain.Students;
+
 namespace ExampleApp.Api.Domain.Academia;
 
 internal class Course : AggregateRoot<string>
@@ -21,7 +23,7 @@ internal class Course : AggregateRoot<string>
     /// <summary>
     /// EF Constructor
     /// </summary>
-    protected Course(string id, string description,  DateTimeOffset createdOn, DateTimeOffset lastModifiedOn)
+    protected Course(string id, string description, DateTimeOffset createdOn, DateTimeOffset lastModifiedOn)
     {
         Id = id;
         Description = description;
@@ -29,8 +31,9 @@ internal class Course : AggregateRoot<string>
         LastModifiedOn = lastModifiedOn;
     }
     public string Description { get; init; }
-    public Semester Semester { get; protected init; }
     public Professor Professor { get; protected set; }
+    public Semester Semester { get; protected init; }
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
 
     public void UpdateProfessor(Professor newProfessor)
     {
