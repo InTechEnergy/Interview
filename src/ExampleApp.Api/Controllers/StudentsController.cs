@@ -25,20 +25,19 @@ public class StudentsController : ControllerBase
     public async Task<IEnumerable<StudentModel>> GetCurrent()
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
-        ICollection<StudentCourseCount> students = await _mediator.Send(new GetStudentsActiveOnDateQuery(today));
+        ICollection<StudentCourseCountModel> students = await _mediator.Send(new GetStudentsActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current students", students.Count);
 
-        List<StudentModel> models = new();
-
-        foreach (var student in students)
-        {
-            //KeyNameModel semesterModel = new KeyNameModel(student.Semester.Id, student.Semester.Description);
-            //KeyNameModel professorModel = new KeyNameModel(student.Professor.Id.ToString(), student.Professor.FullName);
-            StudentModel courseModel = new(student.Student.Id, student.Student.FullName, student.Student.Badge, student.CourseCount);
-
-            models.Add(courseModel);
-        }
-
-        return models;
+        return students
+            .Select(student =>
+                new StudentModel(
+                    student.Student.Id,
+                    student.Student.FullName,
+                    student.Student.Badge,
+                    student.CourseCount)
+                )
+            .ToList()
+            .OrderByDescending(x => x.courseCount)
+            .ThenBy(x => x.fullName);
     }
 }
