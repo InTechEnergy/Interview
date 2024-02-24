@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ExampleApp.Api.Controllers;
 
+/// <summary>
+/// The controller for the students resource.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class StudentsController : ControllerBase
@@ -19,6 +22,10 @@ public class StudentsController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Gets the students currently enrolled in the academy.
+    /// </summary>
+    /// <returns></returns>
     [HttpGet(Name = "GetStudents")]
     public async Task<IEnumerable<StudentModel>> GetCurrent()
     {
