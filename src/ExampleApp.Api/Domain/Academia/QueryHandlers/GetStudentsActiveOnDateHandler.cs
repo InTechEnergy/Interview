@@ -26,17 +26,5 @@ internal class GetStudentsActiveOnDateHandler : IRequestHandler<GetStudentsActiv
                 CourseCount = s.StudentCourses.Count(sc => sc.Course.Semester.Start <= request.ActiveOn && request.ActiveOn <= sc.Course.Semester.End)
             })
             .ToListAsync(cancellationToken);
-
-
-        //.ToListAsync(cancellationToken: cancellationToken)
-
-        //.ContinueWith(t => t.Result
-        //    .Where(s => s.StudentCourses != null && s.StudentCourses
-        //        && s.StudentCourses.Course != null && s.StudentCourses.Course.Semester != null
-
-        //    .Count(sc => sc?.Course?
-        //        .Semester.Start <= request.ActiveOn && request.ActiveOn <= sc.Course.Semester.End) > 0
-        //        )
-        //    .ToList(), cancellationToken);
     }
 }

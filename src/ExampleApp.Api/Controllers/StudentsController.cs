@@ -1,10 +1,8 @@
 ﻿using ExampleApp.Api.Controllers.Models;
+using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
-using ExampleApp.Api.Domain.Academia;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ExampleApp.Api.Domain.Students;
-using ExampleApp.Api.Domain.Academia.Models;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -13,9 +11,9 @@ namespace ExampleApp.Api.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ILogger<CoursesController> _logger;
+    private readonly ILogger<StudentsController> _logger;
 
-    public StudentsController(IMediator mediator, ILogger<CoursesController> logger)
+    public StudentsController(IMediator mediator, ILogger<StudentsController> logger)
     {
         _mediator = mediator;
         _logger = logger;
