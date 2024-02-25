@@ -35,12 +35,14 @@ INSERT INTO [example-db].dbo.Professors
     ('test professor 01', null),
     ('test professor 02', '02');
 INSERT INTO [example-db].dbo.Courses
-  (Id, Description, ProfessorId, SemesterId)
+  (Id, Description, ProfessorId, SemesterId, CreatedOn, LastModifiedOn)
 SELECT
     'TEST-01' [Id],
     'Test Course 01' [Description],
     p.Id ProfessorId,
-    'tst-01' SemesterId
+    'tst-01' SemesterId,
+    GETDATE(),
+    GETDATE()
 FROM [example-db].dbo.Professors p
 WHERE FullName = 'test professor 01';
 ");

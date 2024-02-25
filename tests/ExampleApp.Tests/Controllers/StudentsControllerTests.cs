@@ -40,7 +40,7 @@ public class StudentsControllerTests
         Assert.Equal(expectedStudents.Count, students.Count());
         Assert.Equal(expectedStudents[0].Student.Id, students.First().Id);
         Assert.Equal(expectedStudents[0].Student.FullName, students.First().fullName);
-        Assert.Equal(expectedStudents[0].Student.Badge, students.First().bagde);
+        Assert.Equal(expectedStudents[0].Student.Badge, students.First().badge);
         Assert.Equal(expectedStudents[0].CourseCount, students.First().courseCount);
     }
 
