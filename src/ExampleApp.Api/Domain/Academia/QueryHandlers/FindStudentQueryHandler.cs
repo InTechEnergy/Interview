@@ -20,19 +20,14 @@ internal class FindStudentQueryHandler : IRequestHandler<FindStudentQuery, Stude
 
         if (!string.IsNullOrEmpty(request.request.FullName))
         {
-            query = query.Where(c => c.FullName == request.request.FullName);
+            query = query.Where(c => c.FullName.ToLower() == request.request.FullName.ToLower());
         }
 
         if (!string.IsNullOrEmpty(request.request.BadgeNumber))
         {
-            query = query.Where(c => c.Badge == request.request.BadgeNumber);
+            query = query.Where(c => c.Badge.ToLower() == request.request.BadgeNumber.ToLower());
         }
 
         return await query.FirstOrDefaultAsync(cancellationToken);
-
-        //return await _context.Students
-        //        .FirstOrDefaultAsync(c => c.FullName == request.request.FullName
-        //            || c.Badge == request.request.BadgeNumber
-        //        , cancellationToken);
     }
 }

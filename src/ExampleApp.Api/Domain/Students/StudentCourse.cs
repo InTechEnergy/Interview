@@ -6,8 +6,8 @@ internal class StudentCourse
 {
     public int Id { get; set; }
     public int StudentId { get; set; }
-    public string? CourseId { get; set; }
+    public required string CourseId { get; set; }
 
-    public virtual required Student Student { get; set; }
-    public virtual required Course Course { get; set; }
+    public virtual Student? Student { get; set; }
+    public virtual Course? Course { get; set; }
 }

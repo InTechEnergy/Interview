@@ -1,7 +1,7 @@
+using ExampleApp.Api.Domain.Academia.EntityConfiguration;
 using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace ExampleApp.Api.Domain.Academia;
 
@@ -21,16 +21,9 @@ internal class AcademiaDbContext : DbContext
     {
         base.OnModelCreating(builder);
 
-        _ = builder.Entity<Semester>(
-            e =>
-            {
-                _ = e.Property(x => x.Start).HasColumnName("StartDate");
-                _ = e.Property(x => x.End).HasColumnName("EndDate");
-            });
-
-        _ = builder.Entity<Student>()
-            .HasIndex(s => s.Badge)
-            .IsUnique();
+        _ = builder.ApplyConfiguration(new SemesterConfiguration());
+        _ = builder.ApplyConfiguration(new StudentConfiguration());
+        _ = builder.ApplyConfiguration(new StudentCourseConfiguration());
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder builder)
