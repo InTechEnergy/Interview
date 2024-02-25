@@ -1,9 +1,11 @@
 ﻿using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Interfaces;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace ExampleApp.Tests.Controllers;
 
@@ -16,19 +18,17 @@ public class StudentsControllerIntegrationTests : IClassFixture<DatabaseFixture>
     {
         var mediator = (IMediator)fixture.Services.GetService(typeof(IMediator))!;
         var logger = (ILogger<StudentsController>)fixture.Services.GetService(typeof(ILogger<StudentsController>))!;
-        _controller = new StudentsController(mediator, logger);
+        var coursesService = (ICoursesService)fixture.Services.GetService(typeof(ICoursesService))!;
+        var validationsService = (IValidationsService)fixture.Services.GetService(typeof(IValidationsService))!;
+
+        _controller = new StudentsController(mediator, logger, coursesService, validationsService);
         _db = (AcademiaDbContext)fixture.Services.GetService(typeof(AcademiaDbContext))!;
 
         Dispose();
-
-        // create records available for all tests
-        // TODO: Insert test students and their courses into the database
     }
 
     public void Dispose()
     {
-        // clean up after tests
-        // TODO: Delete test students and their courses from the database
     }
 
     [Fact]

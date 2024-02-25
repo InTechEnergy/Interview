@@ -3,6 +3,9 @@ using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
 using ExampleApp.Api.Domain.Students;
+using ExampleApp.Api.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -12,13 +15,18 @@ public class StudentsControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock;
     private readonly Mock<ILogger<StudentsController>> _loggerMock;
+    private readonly Mock<ICoursesService> _coursesServiceMock;
+    private readonly Mock<IValidationsService> _validationsServiceMock;
+
     private readonly StudentsController _controller;
 
     public StudentsControllerTests()
     {
         _mediatorMock = new Mock<IMediator>();
         _loggerMock = new Mock<ILogger<StudentsController>>();
-        _controller = new StudentsController(_mediatorMock.Object, _loggerMock.Object);
+        _coursesServiceMock = new Mock<ICoursesService>();
+        _validationsServiceMock = new Mock<IValidationsService>();
+        _controller = new StudentsController(_mediatorMock.Object, _loggerMock.Object, _coursesServiceMock.Object, _validationsServiceMock.Object);
     }
 
     [Fact]
@@ -57,5 +65,20 @@ public class StudentsControllerTests
         IEnumerable<StudentModel> students = Assert.IsAssignableFrom<IEnumerable<StudentModel>>(result);
 
         Assert.Empty(students);
+    }
+
+    [Fact]
+    public async Task EnrollStudentInCourse_ReturnsBadRequest_WhenModelStateIsInvalid()
+    {
+        _validationsServiceMock
+            .Setup(vs => vs.CheckErrorsAsync(It.IsAny<StudentEnrollmentCourseRequestModel>(), It.IsAny<ModelStateDictionary>()))
+            .Returns(new List<ModelStateError>());
+
+        StudentsController controller = new(_mediatorMock.Object, _loggerMock.Object, _coursesServiceMock.Object, _validationsServiceMock.Object);
+        controller.ModelState.AddModelError("TestError", "Invalid model state");
+        StudentEnrollmentCourseRequestModel request = new();
+        IActionResult result = await controller.EnrollStudentInCourse(request);
+
+        _ = Assert.IsType<BadRequestObjectResult>(result);
     }
 }
