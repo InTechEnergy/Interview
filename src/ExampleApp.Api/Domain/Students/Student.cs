@@ -6,6 +6,5 @@ internal class Student
     public required string FullName { get; set; }
     public required string Badge { get; set; }
     public required ResidentStatus ResidentStatus { get; set; }
-
-    public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; } = new List<StudentCourse>();
 }
