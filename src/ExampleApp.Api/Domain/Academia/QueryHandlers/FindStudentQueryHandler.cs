@@ -16,7 +16,23 @@ internal class FindStudentQueryHandler : IRequestHandler<FindStudentQuery, Stude
 
     public async Task<Student?> Handle(FindStudentQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Students
-                .FirstOrDefaultAsync(c => c.FullName == request.request.FullName, cancellationToken);
+        IQueryable<Student> query = _context.Students.AsQueryable();
+
+        if (!string.IsNullOrEmpty(request.request.FullName))
+        {
+            query = query.Where(c => c.FullName == request.request.FullName);
+        }
+
+        if (!string.IsNullOrEmpty(request.request.BadgeNumber))
+        {
+            query = query.Where(c => c.Badge == request.request.BadgeNumber);
+        }
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+
+        //return await _context.Students
+        //        .FirstOrDefaultAsync(c => c.FullName == request.request.FullName
+        //            || c.Badge == request.request.BadgeNumber
+        //        , cancellationToken);
     }
 }

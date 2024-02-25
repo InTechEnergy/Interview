@@ -4,4 +4,4 @@ using MediatR;
 
 namespace ExampleApp.Api.Domain.Academia.Queries;
 
-internal record FindStudentQuery(StudentEnrollmentCourseRequest request) : IRequest<Student?>;
+internal record FindStudentQuery(StudentEnrollmentCourseRequestModel request) : IRequest<Student?>;

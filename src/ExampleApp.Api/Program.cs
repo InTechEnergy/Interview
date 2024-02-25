@@ -1,4 +1,5 @@
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddDbContext<AcademiaDbContext>(
     opt => opt.UseSqlServer(
         config.GetConnectionString("Default"),

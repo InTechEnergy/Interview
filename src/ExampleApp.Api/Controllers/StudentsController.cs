@@ -1,12 +1,12 @@
-﻿using Azure;
+﻿using ExampleApp.Api.Common;
 using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
 using ExampleApp.Api.Domain.Students;
+using ExampleApp.Api.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -20,7 +20,8 @@ public class StudentsController : ControllerBase
     private readonly IMediator _mediator;
     private readonly ILogger<StudentsController> _logger;
 
-    public StudentsController(IMediator mediator, ILogger<StudentsController> logger)
+    public StudentsController(IMediator mediator,
+        ILogger<StudentsController> logger)
     {
         _mediator = mediator;
         _logger = logger;
@@ -51,48 +52,65 @@ public class StudentsController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the students currently enrolled in the academy.
+    /// Enrrolls a student in a course.
     /// </summary>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("student-enroll")]
-    public async Task<IActionResult> EnrollStudentInCourse([FromBody] StudentEnrollmentCourseRequest request)
+    public async Task<IActionResult> EnrollStudentInCourse([FromBody] StudentEnrollmentCourseRequestModel request)
     {
         try
         {
+            if (request is null)
+            {
+                return BadRequest(Constants.BODY_REQUEST_IS_REQUIRED);
+            }
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                List<ModelStateError> errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .Select(x => new ModelStateError()
+                    {
+                        FieldName = x.Key,
+                        ErrorMessage = x.Value?.Errors.Select(e => e.ErrorMessage)
+                    })
+                    .ToList();
+
+                return BadRequest(errors);
             }
 
             Course? course = await _mediator.Send(new FindCourseByIdQuery(request.CourseId));
+
             if (course is null)
             {
                 return NotFound($"Course {request.CourseId} not found.");
             }
-
-            Student? student = await _mediator.Send(new FindStudentQuery(request));
-            if (student is null)
+            else
             {
-                return NotFound($"Student {student} not found.");
+                DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+                ICollection<Course> activeCourses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
+
+                if(!activeCourses.Contains(course))
+                {
+                    return BadRequest($"Course {course.Id} is not active today.");
+                }
             }
 
+            Student? student = await _mediator.Send(new FindStudentQuery(request));
 
-            //// Assume that _enrollmentService is a service that handles the enrollment process
-            //var enrollment = await _enrollmentService.EnrollStudentInCourse(studentId, courseId);
+            if (student is null)
+            {
+                string message = $"{request.FullName} {request.BadgeNumber}".Trim();
+                return NotFound($"Student {message} not found.");
+            }
 
-            //if (enrollment == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return CreatedAtAction(nameof(GetEnrollment), new { studentId = studentId, courseId = courseId }, enrollment);
             return Ok();
         }
         catch (Exception ex)
         {
-            // Log the exception here
-            return BadRequest(ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"{Constants.ERROR_OCCURRED} {ex.Message}");
         }
     }
 
