@@ -27,18 +27,12 @@ public class CoursesController : ControllerBase
         ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        List<CourseModel> models = new();
-
-        foreach (var course in courses)
-        {
-            KeyNameModel semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);
-            KeyNameModel professorModel = new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName);
-            CourseModel courseModel = new(course.Id, course.Description, semesterModel, professorModel);
-
-            models.Add(courseModel);
-        }
-
-        return models;
+        return courses.Select(course => new CourseModel(
+            course.Id,
+            course.Description,
+            new KeyNameModel(course.Semester.Id, course.Semester.Description),
+            new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName)
+        )).ToList();
     }
 
     [HttpPatch(Name = "UpdatesProfessor")]
