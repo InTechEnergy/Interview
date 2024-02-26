@@ -1,3 +1,3 @@
 namespace ExampleApp.Api.Controllers.Models;
 
-public record ProfessorUpdateModel(string CourseId, string NewProfessorName);
+public record ProfessorUpdateModel(Guid CourseId, string NewProfessorName);

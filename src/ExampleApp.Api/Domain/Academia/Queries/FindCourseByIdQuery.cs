@@ -2,4 +2,4 @@ using MediatR;
 
 namespace ExampleApp.Api.Domain.Academia.Queries;
 
-internal record FindCourseByIdQuery(string Name) : IRequest<Course?>;
+internal record FindCourseByIdQuery(Guid Id) : IRequest<Course?>;

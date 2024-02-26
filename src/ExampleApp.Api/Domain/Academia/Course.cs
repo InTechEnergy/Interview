@@ -1,9 +1,9 @@
 namespace ExampleApp.Api.Domain.Academia;
 
-internal class Course : AggregateRoot<string>
+internal class Course : AggregateRoot<Guid>
 {
     public Course(
-        string id,
+        Guid id,
         string description,
         Semester semester,
         Professor professor,
@@ -21,7 +21,7 @@ internal class Course : AggregateRoot<string>
     /// <summary>
     /// EF Constructor
     /// </summary>
-    protected Course(string id, string description,  DateTimeOffset createdOn, DateTimeOffset lastModifiedOn)
+    protected Course(Guid id, string description, DateTimeOffset createdOn, DateTimeOffset lastModifiedOn)
     {
         Id = id;
         Description = description;

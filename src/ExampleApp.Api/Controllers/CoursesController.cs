@@ -31,7 +31,7 @@ public class CoursesController : ControllerBase
         foreach (var course in courses)
         {
             var semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);
-            var professorModel = new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName);
+            var professorModel = new KeyNameModel(course.Professor.Id, course.Professor.FullName);
             CourseModel courseModel = new(course.Id, course.Description, semesterModel, professorModel);
             models.Add(courseModel);
         }

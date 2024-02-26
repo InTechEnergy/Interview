@@ -7,6 +7,7 @@ internal class AcademiaDbContext : DbContext
 {
     public AcademiaDbContext(DbContextOptions<AcademiaDbContext> options) : base(options)
     {
+        this.Database.EnsureCreated();
     }
 
     internal DbSet<Course> Courses { get; set; }
@@ -17,12 +18,7 @@ internal class AcademiaDbContext : DbContext
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Semester>(
-            e =>
-            {
-                e.Property(x => x.Start).HasColumnName("StartDate");
-                e.Property(x => x.End).HasColumnName("EndDate");
-            });
+        builder.ApplyConfigurationsFromAssembly(typeof(AcademiaDbContext).Assembly);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder builder)
