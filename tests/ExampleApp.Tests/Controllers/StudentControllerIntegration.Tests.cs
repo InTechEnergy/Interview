@@ -5,7 +5,6 @@ using ExampleApp.Api.Interfaces;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace ExampleApp.Tests.Controllers;
 

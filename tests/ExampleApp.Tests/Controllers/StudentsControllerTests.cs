@@ -17,7 +17,6 @@ public class StudentsControllerTests
     private readonly Mock<ILogger<StudentsController>> _loggerMock;
     private readonly Mock<ICoursesService> _coursesServiceMock;
     private readonly Mock<IValidationsService> _validationsServiceMock;
-
     private readonly StudentsController _controller;
 
     public StudentsControllerTests()
@@ -70,7 +69,7 @@ public class StudentsControllerTests
     [Fact]
     public async Task EnrollStudentInCourse_ReturnsBadRequest_WhenModelStateIsInvalid()
     {
-        _validationsServiceMock
+        _ = _validationsServiceMock
             .Setup(vs => vs.CheckErrorsAsync(It.IsAny<StudentEnrollmentCourseRequestModel>(), It.IsAny<ModelStateDictionary>()))
             .Returns(new List<ModelStateError>());
 

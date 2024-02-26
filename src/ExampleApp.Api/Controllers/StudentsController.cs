@@ -98,5 +98,4 @@ public class StudentsController : ControllerBase
 
         return CreatedAtAction("EnrollStudentInCourse", studentCourse);
     }
-
 }
