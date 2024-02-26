@@ -20,11 +20,13 @@ public class CoursesControllerTests
     [Fact]
     public async Task MapsCurrentCourses()
     {
+        var courseGuid1 = Guid.NewGuid();
+        var courseGuid2 = Guid.NewGuid();
         // Arrange
         List<Course> courses = new()
         {
             new Course(
-                Guid.NewGuid(),
+                courseGuid1,
                 "test 1",
                 new Semester
                 {
@@ -37,7 +39,7 @@ public class CoursesControllerTests
                 DateTimeOffset.Now
             ),
             new Course(
-                Guid.NewGuid(),
+                courseGuid2,
                 "test 2",
                 new Semester
                 {
@@ -63,31 +65,31 @@ public class CoursesControllerTests
                 {
                     new
                     {
-                        Id = "test1",
+                        Id = courseGuid1,
                         Description = "test 1",
                         Semester = new
                         {
-                            Key = default(string?),
+                            Key = Guid.Empty,
                             Name = "sem-1"
                         },
                         Professor = new
                         {
-                            Key = "0",
+                            Key = Guid.Empty,
                             Name = "prof one"
                         }
                     },
                     new
                     {
-                        Id = "test2",
+                        Id = courseGuid2,
                         Description = "test 2",
                         Semester = new
                         {
-                            Key = default(string?),
+                            Key = Guid.Empty,
                             Name = "sem-1"
                         },
                         Professor = new
                         {
-                            Key = "0",
+                            Key = Guid.Empty,
                             Name = "prof one"
                         }
                     }

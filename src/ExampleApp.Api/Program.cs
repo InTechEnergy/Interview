@@ -1,21 +1,18 @@
+using ExampleApp.Api.CrossCutting.DI;
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
+using ExampleApp.Api.Domain.Students.Entities;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
-// Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<AcademiaDbContext>(
-    opt => opt.UseSqlServer(config.GetConnectionString("Default")));
-builder.Services.AddMediatR(
-    cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddServices(config);
 
 var app = builder.Build();
+
+app.MapEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
