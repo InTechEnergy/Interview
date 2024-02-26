@@ -1,6 +1,7 @@
 using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +62,7 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
     public async Task UpdatesProfessor()
     {
         // Arrange
-        ProfessorUpdateModel payload = new("TEST-01", "test professor 02");
+        ProfessorUpdateModel payload = new(Guid.NewGuid(), "test professor 02");
 
         // Act
         var response = await _controller.UpdateProfessor(payload);
@@ -72,7 +73,7 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
         Course? course = await _db.Courses
             .Include(c => c.Professor)
             .Include(c => c.Semester)
-            .FirstOrDefaultAsync(c => c.Id == "TEST-01");
+            .FirstOrDefaultAsync(c => c.Id == payload.CourseId);
 
         course.Should().NotBeNull();
         course.Professor.FullName.Should().Be("test professor 02");
@@ -83,7 +84,7 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
     public async Task ReturnsNotFoundIfCourseIsNotFound()
     {
         // Arrange
-        ProfessorUpdateModel payload = new("TEST-00", "test professor 02");
+        ProfessorUpdateModel payload = new(Guid.NewGuid(), "test professor 02");
 
         // Act
         var response = await _controller.UpdateProfessor(payload);
@@ -102,7 +103,7 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
         Course? course = await _db.Courses
             .Include(c => c.Professor)
             .Include(c => c.Semester)
-            .FirstOrDefaultAsync(c => c.Id == "TEST-01");
+            .FirstOrDefaultAsync(c => c.Id == payload.CourseId);
 
         course.Should().NotBeNull();
         course.Professor.FullName.Should().Be("test professor 01");

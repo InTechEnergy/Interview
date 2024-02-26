@@ -1,4 +1,5 @@
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

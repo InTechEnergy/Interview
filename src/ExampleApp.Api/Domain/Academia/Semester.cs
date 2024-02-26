@@ -1,3 +1,5 @@
+using ExampleApp.Api.Domain.SharedKernel;
+
 namespace ExampleApp.Api.Domain.Academia;
 
 internal class Semester : ValueObject<Guid>

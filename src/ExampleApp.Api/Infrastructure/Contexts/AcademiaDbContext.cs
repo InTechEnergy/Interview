@@ -1,3 +1,4 @@
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using ExampleApp.Api.Extensions;
 using Microsoft.EntityFrameworkCore;
 

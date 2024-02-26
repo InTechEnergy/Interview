@@ -1,4 +1,6 @@
-namespace ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.Academia;
+
+namespace ExampleApp.Api.Domain.SharedKernel.Entities;
 
 internal class Course : AggregateRoot<Guid>
 {

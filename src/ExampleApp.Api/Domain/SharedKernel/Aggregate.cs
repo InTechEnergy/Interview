@@ -1,4 +1,4 @@
-namespace ExampleApp.Api.Domain;
+namespace ExampleApp.Api.Domain.SharedKernel;
 
 internal class Aggregate<T> where T : notnull
 {

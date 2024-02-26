@@ -2,6 +2,7 @@ using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Queries;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

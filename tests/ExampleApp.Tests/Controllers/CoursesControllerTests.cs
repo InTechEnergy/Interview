@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using ExampleApp.Api.Controllers;
 using Microsoft.Extensions.Logging;
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using FluentAssertions;
 
 namespace ExampleApp.Tests;
@@ -23,7 +24,7 @@ public class CoursesControllerTests
         List<Course> courses = new()
         {
             new Course(
-                "test1",
+                Guid.NewGuid(),
                 "test 1",
                 new Semester
                 {
@@ -36,7 +37,7 @@ public class CoursesControllerTests
                 DateTimeOffset.Now
             ),
             new Course(
-                "test2",
+                Guid.NewGuid(),
                 "test 2",
                 new Semester
                 {

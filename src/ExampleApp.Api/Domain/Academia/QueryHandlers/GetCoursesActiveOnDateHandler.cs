@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using ExampleApp.Api.Domain.Academia.Queries;
+using ExampleApp.Api.Domain.SharedKernel.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
