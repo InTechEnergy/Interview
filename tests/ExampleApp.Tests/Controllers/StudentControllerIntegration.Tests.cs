@@ -20,15 +20,10 @@ public class StudentsControllerIntegrationTests : IClassFixture<DatabaseFixture>
         _db = (AcademiaDbContext)fixture.Services.GetService(typeof(AcademiaDbContext))!;
 
         Dispose();
-
-        // create records available for all tests
-        // TODO: Insert test students and their courses into the database
     }
 
     public void Dispose()
     {
-        // clean up after tests
-        // TODO: Delete test students and their courses from the database
     }
 
     [Fact]
