@@ -1,5 +1,4 @@
-﻿using CsvHelper;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Commands;
@@ -9,7 +8,6 @@ using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -23,16 +21,19 @@ public class StudentsController : ControllerBase
     private readonly IMediator _mediator;
     private readonly ILogger<StudentsController> _logger;
     private readonly ICoursesService _coursesService;
+    private readonly List<IFileProcessorService> _fileProcessors;
     private readonly IValidationsService _validationsService;
 
     public StudentsController(IMediator mediator,
         ILogger<StudentsController> logger,
         ICoursesService coursesService,
+        IEnumerable<IFileProcessorService> fileProcessors,
         IValidationsService validationsService)
     {
         _mediator = mediator;
         _logger = logger;
         _coursesService = coursesService;
+        _fileProcessors = fileProcessors.ToList();
         _validationsService = validationsService;
     }
 
@@ -115,69 +116,90 @@ public class StudentsController : ControllerBase
         string contentType = file.ContentType;
         string extension = Path.GetExtension(file.FileName);
 
-        if (!(contentType == "text/csv" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || contentType == "application/vnd.ms-excel")
-            && !(extension == ".csv" || extension == ".xlsx" || extension == ".xls"))
+        var processor = _fileProcessors.FirstOrDefault(p => p.CanProcess(contentType, extension));
+
+        if (processor == null)
         {
             return BadRequest("Invalid file type. Please upload a CSV or Excel file.");
         }
 
         try
         {
-            if (extension == ".csv")
-            {
-                using var reader = new StreamReader(file.OpenReadStream());
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            var records = processor.Process(file);
 
-                try
-                {
-                    List<StudentEnrollmentCourseBulkRequestModel> records = csv.GetRecords<StudentEnrollmentCourseBulkRequestModel>().ToList();
-
-                    foreach (var record in records)
-                    {
-                    }
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Invalid headers. The CSV file should have headers: StudentName, StudentBadge, CourseId");
-                }
-
-            }
-            if (extension is ".xlsx" or ".xls")
-            {
-                using var stream = file.OpenReadStream();
-                using var document = SpreadsheetDocument.Open(stream, false);
-                var workbookPart = document.WorkbookPart;
-                var sheet = workbookPart.Workbook.Descendants<Sheet>().First();
-                var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-                var rows = worksheetPart.Worksheet.Descendants<Row>();
-
-                List<StudentEnrollmentCourseBulkRequestModel> records = new List<StudentEnrollmentCourseBulkRequestModel>();
-
-                foreach (var row in rows)
-                {
-                    if (row.RowIndex.Value == 1)
-                    {
-                        continue;
-                    }
-
-                    var cells = row.Elements<Cell>().ToList();
-
-                    var record = new StudentEnrollmentCourseBulkRequestModel
-                    {
-                        StudentName = GetCellValue(workbookPart, cells[0]),
-                        StudentBadge = GetCellValue(workbookPart, cells[1]),
-                        CourseId = GetCellValue(workbookPart, cells[2])
-                    };
-
-                    records.Add(record);
-                }
-
-            }
+            // Do something with the records...
         }
         catch (Exception ex)
         {
             return BadRequest($"An error occurred while processing the file: {ex.Message}");
         }
+
+        //string contentType = file.ContentType;
+        //string extension = Path.GetExtension(file.FileName);
+
+        //if (!(contentType == "text/csv" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || contentType == "application/vnd.ms-excel")
+        //    && !(extension == ".csv" || extension == ".xlsx" || extension == ".xls"))
+        //{
+        //    return BadRequest("Invalid file type. Please upload a CSV or Excel file.");
+        //}
+
+        //try
+        //{
+        //    if (extension == ".csv")
+        //    {
+        //        using var reader = new StreamReader(file.OpenReadStream());
+        //        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        //        try
+        //        {
+        //            List<StudentEnrollmentCourseBulkRequestModel> records = csv.GetRecords<StudentEnrollmentCourseBulkRequestModel>().ToList();
+
+        //            foreach (var record in records)
+        //            {
+        //            }
+        //        }
+        //        catch (Exception)
+        //        {
+        //            return BadRequest("Invalid headers. The CSV file should have headers: StudentName, StudentBadge, CourseId");
+        //        }
+
+        //    }
+        //    if (extension is ".xlsx" or ".xls")
+        //    {
+        //        using var stream = file.OpenReadStream();
+        //        using var document = SpreadsheetDocument.Open(stream, false);
+        //        var workbookPart = document.WorkbookPart;
+        //        var sheet = workbookPart.Workbook.Descendants<Sheet>().First();
+        //        var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+        //        var rows = worksheetPart.Worksheet.Descendants<Row>();
+
+        //        List<StudentEnrollmentCourseBulkRequestModel> records = new List<StudentEnrollmentCourseBulkRequestModel>();
+
+        //        foreach (var row in rows)
+        //        {
+        //            if (row.RowIndex.Value == 1)
+        //            {
+        //                continue;
+        //            }
+
+        //            var cells = row.Elements<Cell>().ToList();
+
+        //            var record = new StudentEnrollmentCourseBulkRequestModel
+        //            {
+        //                StudentName = GetCellValue(workbookPart, cells[0]),
+        //                StudentBadge = GetCellValue(workbookPart, cells[1]),
+        //                CourseId = GetCellValue(workbookPart, cells[2])
+        //            };
+
+        //            records.Add(record);
+        //        }
+
+        //    }
+        //}
+        //catch (Exception ex)
+        //{
+        //    return BadRequest($"An error occurred while processing the file: {ex.Message}");
+        //}
 
         return Ok();
     }

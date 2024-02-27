@@ -33,6 +33,10 @@ builder.Services.AddDbContext<AcademiaDbContext>(
 builder.Services.AddMediatR(
     cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
+builder.Services.AddTransient<IFileProcessorService, CsvFileProcessorService>();
+builder.Services.AddTransient<IFileProcessorService, ExcelFileProcessorService>();
+
+
 var app = builder.Build();
 
 // Ensure the database is created.
