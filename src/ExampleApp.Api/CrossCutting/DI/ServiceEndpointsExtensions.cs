@@ -7,5 +7,6 @@ public static class ServiceEndpointsExtensions
     public static void MapEndpoints(this WebApplication webApplication)
     {
         StudentCoursesEndpoints.MapEndpoints(webApplication);
+        CoursesEndpoint.MapEndpoints(webApplication);
     }
 }

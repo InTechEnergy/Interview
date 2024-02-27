@@ -7,16 +7,16 @@ namespace ExampleApp.Api.Domain.Academia.QueryHandlers.Students;
 
 internal class GetStudentCoursesByCurrentSemesterHandler : IRequestHandler<GetStudentCoursesByCurrentSemesterQuery, Result<IReadOnlyList<StudentCourseView>>>
 {
-    private readonly IStudentCoursesRepository _studentCoursesRepository;
+    private readonly ICoursesRepository _coursesRepository;
 
-    public GetStudentCoursesByCurrentSemesterHandler(IStudentCoursesRepository studentCoursesRepository)
+    public GetStudentCoursesByCurrentSemesterHandler(ICoursesRepository coursesRepository)
     {
-        _studentCoursesRepository = studentCoursesRepository;
+        _coursesRepository = coursesRepository;
     }
 
     public async Task<Result<IReadOnlyList<StudentCourseView>>> Handle(GetStudentCoursesByCurrentSemesterQuery request, CancellationToken cancellationToken)
     {
-        var studentCourses = await _studentCoursesRepository.GetAllByCurrentSemesterAsync();
+        var studentCourses = await _coursesRepository.GetAllByCurrentSemesterAsync();
 
         return studentCourses
             .Select(sc => new StudentCourseView(new StudentView(sc.Student.Id, sc.Student.FullName),

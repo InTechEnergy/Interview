@@ -2,17 +2,18 @@ using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.SharedKernel.Contracts;
 using ExampleApp.Api.Domain.SharedKernel.Entities;
 using ExampleApp.Api.Domain.SharedKernel.Specifications;
+using ExampleApp.Api.Domain.Students.Entities;
 using ExampleApp.Api.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExampleApp.Api.Infrastructure.Repositories;
 
-internal sealed class StudentCoursesRepository : IStudentCoursesRepository
+internal sealed class CoursesRepository : ICoursesRepository
 {
     private readonly AcademiaDbContext _dbContext;
     private readonly ISpecificationEvaluator _specificationEvaluator;
 
-    public StudentCoursesRepository(
+    public CoursesRepository(
         AcademiaDbContext dbContext,
         ISpecificationEvaluator specificationEvaluator)
     {
@@ -38,5 +39,17 @@ internal sealed class StudentCoursesRepository : IStudentCoursesRepository
                 .Where(c => c.Semester.Start <= dateNow && c.Semester.End >= dateNow)
                 .ToList()))
             .ToListAsync();
+    }
+
+    public Task<Course> GetCourseByIdAsync(Guid courseId) => _dbContext.Courses
+        .Include(c => c.Professor)
+        .Include(c => c.Semester)
+        .SingleOrDefaultAsync(c => c.Id == courseId);
+
+    public async Task<StudentCourses> SubscribeStudentToCourseAsync(Course course, Student student)
+    {
+        var studentCourses = new StudentCourses(student, new List<Course> { course });
+        await _dbContext.StudentCourses.AddAsync(studentCourses);
+        return studentCourses;
     }
 }

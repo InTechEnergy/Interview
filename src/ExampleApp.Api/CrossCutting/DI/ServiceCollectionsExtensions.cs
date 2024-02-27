@@ -1,6 +1,7 @@
 using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.SharedKernel.Contracts;
+using ExampleApp.Api.Domain.Students.Contracts;
 using ExampleApp.Api.Infrastructure.Repositories;
 using ExampleApp.Api.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,8 @@ public static class ServiceCollectionsExtensions
 
     private static void ConfigureServices(this IServiceCollection services)
     {
-        services.AddScoped<IStudentCoursesRepository, StudentCoursesRepository>();
+        services.AddScoped<ICoursesRepository, CoursesRepository>();
+        services.AddScoped<IStudentRepository, StudentRepository>();
         services.AddScoped<ISpecificationEvaluator, SpecificationEvaluator>();
     }
 

@@ -39,4 +39,11 @@ internal class Course : AggregateRoot<Guid>
         Professor = newProfessor ?? throw new ArgumentNullException(nameof(newProfessor));
         LastModifiedOn = DateTimeOffset.UtcNow;
     }
+
+    public bool IsCurrentOnSemester()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return Semester.Start <= date && Semester.End >= date;
+    }
 }

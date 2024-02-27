@@ -28,6 +28,8 @@ public static class MediatorExtensions
         var problemDetails = CreateProblemDetails(exception, errors);
         return exception switch
         {
+            BusinessException e => Results.BadRequest(problemDetails! with { Type = e.Type, Title = e.Message, Status = 400 }),
+            EntityNotFoundException e => Results.NotFound(problemDetails! with { Type = e.Type, Title = e.Message, Status = 404 }),
             AppException e => Results.Problem(title: e.Message, type: e.Type, statusCode: 500),
             ValidationException e => Results.BadRequest(problemDetails! with { Type = e.GetType().ToString(), Title = e.Message, Status = 400 }),
             _ => Results.Problem(title: "An error occurred while processing your request", detail: "An error occurred while processing your request, please try again in a few moments"),
