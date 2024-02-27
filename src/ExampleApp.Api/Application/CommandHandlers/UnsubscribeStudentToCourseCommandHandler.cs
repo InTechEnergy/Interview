@@ -7,25 +7,25 @@ using MediatR;
 
 namespace ExampleApp.Api.Application.CommandHandlers;
 
-internal class SubscribeStudentToCourseCommandHandler : IRequestHandler<SubscribeStudentToCourseCommand, Result<Unit>>
+internal class UnsubscribeStudentToCourseCommandHandler  : IRequestHandler<UnsubscribeStudentToCourseCommand, Result<Unit>>
 {
     private readonly ICoursesRepository _coursesRepository;
     private readonly IStudentRepository _studentRepository;
-    private readonly ILogger<SubscribeStudentToCourseCommandHandler> _logger;
+    private readonly ILogger<UnsubscribeStudentToCourseCommand> _logger;
 
-    public SubscribeStudentToCourseCommandHandler(
+    public UnsubscribeStudentToCourseCommandHandler(
         ICoursesRepository coursesRepository,
         IStudentRepository studentRepository,
-        ILogger<SubscribeStudentToCourseCommandHandler> logger)
+        ILogger<UnsubscribeStudentToCourseCommand> logger)
     {
         _coursesRepository = coursesRepository;
         _studentRepository = studentRepository;
         _logger = logger;
     }
 
-    public async Task<Result<Unit>> Handle(SubscribeStudentToCourseCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(UnsubscribeStudentToCourseCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Subscribing student to course.");
+        _logger.LogInformation("Unsubscribing student from course.");
 
         if (request is { StudentCourse: null or { Student: null } })
             throw new BusinessException("InvalidRequest", "Invalid request.");
@@ -41,14 +41,12 @@ internal class SubscribeStudentToCourseCommandHandler : IRequestHandler<Subscrib
         var course = await _coursesRepository.GetCourseByIdAsync(courseId);
 
         if (student is null || course is null)
-        {
             throw new EntityNotFoundException();
-        }
 
         if (!course.IsCurrentOnSemester())
             throw new BusinessException("SemesterNotCurrent", "Course semester is not current.");
 
-        await _coursesRepository.SubscribeStudentToCourseAsync(course, student);
+        await _coursesRepository.UnsubscribeStudentFromCourseAsync(course, student);
 
         await _coursesRepository.SaveChangesAsync();
 

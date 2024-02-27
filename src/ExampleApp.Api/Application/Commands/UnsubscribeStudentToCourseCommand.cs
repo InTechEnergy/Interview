@@ -4,4 +4,4 @@ using MediatR;
 
 namespace ExampleApp.Api.Domain.Academia.Commands;
 
-public record SubscribeStudentToCourseCommand(StudentToCourseModel StudentCourse) : IRequest<Result<Unit>>;
+public record UnsubscribeStudentToCourseCommand(StudentToCourseModel StudentCourse) : IRequest<Result<Unit>>;

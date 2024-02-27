@@ -23,7 +23,7 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<Databas
     public async void CourseStudent_WhenStudentNotFound_ShouldThrowError()
     {
         // Arrange
-        var command = new SubscribeStudentToCourseCommand(new SubscribeStudentToCourseModel(Guid.NewGuid(), new StudentModel("fake name", 1)) );
+        var command = new SubscribeStudentToCourseCommand(new StudentToCourseModel(Guid.NewGuid(), new StudentModel("fake name", 1)) );
 
         await FluentActions.Awaiting(() => _mediator.Send(command))
             .Should()
@@ -37,7 +37,7 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<Databas
 
         await _dbContext.SaveChangesAsync();
 
-        var command = new SubscribeStudentToCourseCommand(new SubscribeStudentToCourseModel(Guid.NewGuid(), new StudentModel("New student 1", 1)) );
+        var command = new SubscribeStudentToCourseCommand(new StudentToCourseModel(Guid.NewGuid(), new StudentModel("New student 1", 1)) );
 
         await FluentActions.Awaiting(() => _mediator.Send(command))
             .Should()
@@ -64,13 +64,11 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<Databas
                 professor: new Professor()
                 {
                     FullName = "Professor Math"
-                },
-                DateTimeOffset.Now,
-                DateTimeOffset.Now));
+                }));
 
         await _dbContext.SaveChangesAsync();
 
-        var command = new SubscribeStudentToCourseCommand(new SubscribeStudentToCourseModel(courseId, new StudentModel("New student 1", 1)) );
+        var command = new SubscribeStudentToCourseCommand(new StudentToCourseModel(courseId, new StudentModel("New student 1", 1)) );
 
         var (response, _, _) = await _mediator.Send(command);
 
@@ -101,13 +99,11 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<Databas
                 professor: new Professor()
                 {
                     FullName = "Professor Math"
-                },
-                DateTimeOffset.Now,
-                DateTimeOffset.Now));
+                }));
 
         await _dbContext.SaveChangesAsync();
 
-        var command = new SubscribeStudentToCourseCommand(new SubscribeStudentToCourseModel(courseId, new StudentModel("New student 1", 1)) );
+        var command = new SubscribeStudentToCourseCommand(new StudentToCourseModel(courseId, new StudentModel("New student 1", 1)) );
 
         await FluentActions.Awaiting(() => _mediator.Send(command))
             .Should()
