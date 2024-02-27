@@ -1,4 +1,5 @@
 using ExampleApp.Api.Domain.Academia.Queries.Students;
+using ExampleApp.Api.Domain.Academia.QueryHandlers.Students;
 using ExampleApp.Api.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,9 @@ public static class StudentCoursesEndpoints
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
         app.MapGet("/student-courses", static ([FromServices] IMediator mediator)
-                => mediator.SendCommand(new GetStudentCoursesByCurrentSemesterQuery()));
+            => mediator.SendCommand(new GetStudentCoursesByCurrentSemesterQuery()))
+                .Produces<IReadOnlyList<StudentCourseView>>()
+                .WithDisplayName("Get Student Courses")
+                .WithTags("Student Courses");
     }
 }
