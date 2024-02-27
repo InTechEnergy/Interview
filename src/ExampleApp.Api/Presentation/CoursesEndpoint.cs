@@ -18,9 +18,9 @@ public class CoursesEndpoint
             .WithTags("Courses");
 
         app.MapPut("/courses/{courseId}", static ([FromBody] StudentToCourseModel model, [FromServices] IMediator mediator)
-            => mediator.SendCommand(new GetStudentCoursesByCurrentSemesterQuery()))
+            => mediator.SendCommand(new UnsubscribeStudentToCourseCommand(model)))
             .Produces<Unit>()
-            .WithDisplayName("Associate Student to Course")
+            .WithDisplayName("Dissociate Student from Course")
             .WithTags("Courses");;
     }
 }

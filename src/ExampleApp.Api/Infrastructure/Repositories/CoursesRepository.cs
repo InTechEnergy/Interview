@@ -29,7 +29,8 @@ internal sealed class CoursesRepository : ICoursesRepository
 
         var query = _dbContext
             .StudentCourses
-            .Include(sc => sc.Courses)
+            .Include(sc => sc.Courses
+                .Where(c => !c.IsDeleted))
             .ThenInclude(c => c.Semester);
 
         return await _specificationEvaluator
@@ -44,12 +45,28 @@ internal sealed class CoursesRepository : ICoursesRepository
     public Task<Course> GetCourseByIdAsync(Guid courseId) => _dbContext.Courses
         .Include(c => c.Professor)
         .Include(c => c.Semester)
-        .SingleOrDefaultAsync(c => c.Id == courseId);
+        .SingleOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted);
+
+    public async Task UnsubscribeStudentFromCourseAsync(Course course, Student student)
+    {
+        var studentCourses = await _dbContext.StudentCourses
+            .Include(sc => sc.Courses)
+                .ThenInclude(c => c.Semester)
+            .SingleOrDefaultAsync(sc => sc.Student.Id == student.Id && sc.Courses.Any(c => c.Id == course.Id));
+
+        if (studentCourses is null)
+            return;
+
+        studentCourses.Courses.FirstOrDefault(x => x.Id == course.Id).IsDeleted = true;
+    }
 
     public async Task<StudentCourses> SubscribeStudentToCourseAsync(Course course, Student student)
     {
         var studentCourses = new StudentCourses(student, new List<Course> { course });
         await _dbContext.StudentCourses.AddAsync(studentCourses);
+
         return studentCourses;
     }
+
+    public Task SaveChangesAsync() => _dbContext.SaveChangesAsync();
 }

@@ -57,9 +57,9 @@ internal class DatabaseSeeder
 
         await _academiaDbContext.Semesters.AddRangeAsync(semesters);
 
-        var course01 = new Course(Guid.NewGuid(), "Physics 101", semesters[0], professors[0], DateTimeOffset.Now, DateTimeOffset.Now);
-        var course02 = new Course(Guid.NewGuid(), "Math 101", semesters[1], professors[1], DateTimeOffset.Now, DateTimeOffset.Now);
-        var course03 = new Course(Guid.NewGuid(), "Math 101", semesters[2], professors[2], DateTimeOffset.Now, DateTimeOffset.Now);
+        var course01 = new Course(Guid.NewGuid(), "Physics 101", semesters[0], professors[0]);
+        var course02 = new Course(Guid.NewGuid(), "Math 101", semesters[1], professors[1]);
+        var course03 = new Course(Guid.NewGuid(), "Math 101", semesters[2], professors[2]);
 
         await _academiaDbContext.Courses.AddRangeAsync(course01, course02, course03);
 
