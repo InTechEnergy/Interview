@@ -8,27 +8,21 @@ internal class Course : AggregateRoot<Guid>
         Guid id,
         string description,
         Semester semester,
-        Professor professor,
-        DateTimeOffset createdOn,
-        DateTimeOffset lastModifiedOn)
+        Professor professor)
     {
         Id = id;
         Description = description;
         Semester = semester;
         Professor = professor;
-        CreatedOn = createdOn;
-        LastModifiedOn = lastModifiedOn;
     }
 
     /// <summary>
     /// EF Constructor
     /// </summary>
-    protected Course(Guid id, string description, DateTimeOffset createdOn, DateTimeOffset lastModifiedOn)
+    protected Course(Guid id, string description)
     {
         Id = id;
         Description = description;
-        CreatedOn = createdOn;
-        LastModifiedOn = lastModifiedOn;
     }
     public string Description { get; init; }
     public Semester Semester { get; protected init; }
@@ -37,7 +31,6 @@ internal class Course : AggregateRoot<Guid>
     public void UpdateProfessor(Professor newProfessor)
     {
         Professor = newProfessor ?? throw new ArgumentNullException(nameof(newProfessor));
-        LastModifiedOn = DateTimeOffset.UtcNow;
     }
 
     public bool IsCurrentOnSemester()

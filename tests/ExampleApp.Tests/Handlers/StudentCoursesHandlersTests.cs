@@ -46,9 +46,7 @@ public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisp
                                 professor: new Professor()
                                 {
                                     FullName = "John Snow"
-                                },
-                                createdOn: DateTimeOffset.Now,
-                                lastModifiedOn: DateTimeOffset.Now
+                                }
                             ),
                             new Course(
                                 id: Guid.NewGuid(),
@@ -62,9 +60,7 @@ public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisp
                                 professor: new Professor()
                                 {
                                     FullName = "Dumbledore"
-                                },
-                                createdOn: DateTimeOffset.Now,
-                                lastModifiedOn: DateTimeOffset.Now
+                                }
                             ),
                             new Course(
                                 id: Guid.NewGuid(),
@@ -78,9 +74,7 @@ public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisp
                                 professor: new Professor()
                                 {
                                     FullName = "John Snow"
-                                },
-                                createdOn: DateTimeOffset.Now,
-                                lastModifiedOn: DateTimeOffset.Now
+                                }
                             )
                         }
                     )

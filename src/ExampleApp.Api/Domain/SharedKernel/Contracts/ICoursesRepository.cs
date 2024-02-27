@@ -9,5 +9,9 @@ internal interface ICoursesRepository
 
     Task<Course> GetCourseByIdAsync(Guid courseId);
 
+    Task UnsubscribeStudentFromCourseAsync(Course course, Student student);
+
     Task<StudentCourses> SubscribeStudentToCourseAsync(Course course, Student student);
+
+    Task SaveChangesAsync();
 }

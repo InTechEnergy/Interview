@@ -25,6 +25,6 @@ internal sealed class CourseConfiguration :  IEntityTypeConfiguration<Course>
 
         builder.Property(c => c.CreatedOn);
 
-        builder.Property(c => c.LastModifiedOn);
+        builder.Property(c => c.ChangedOn);
     }
 }

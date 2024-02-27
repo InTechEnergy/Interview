@@ -34,9 +34,7 @@ public class CoursesControllerTests
                     Start = DateOnly.FromDateTime(DateTime.Today),
                     End = DateOnly.FromDateTime(DateTime.Today)
                 },
-                new Professor { FullName = "prof one" },
-                DateTimeOffset.Now,
-                DateTimeOffset.Now
+                new Professor { FullName = "prof one" }
             ),
             new Course(
                 courseGuid2,
@@ -46,9 +44,7 @@ public class CoursesControllerTests
                     Description = "sem-1", Start = DateOnly.FromDateTime(DateTime.Today),
                     End = DateOnly.FromDateTime(DateTime.Today)
                 },
-                new Professor { FullName = "prof one" },
-                DateTimeOffset.Now,
-                DateTimeOffset.Now
+                new Professor { FullName = "prof one" }
             )
         };
         _mediator.Send(Arg.Any<IRequest<ICollection<Course>>>())
