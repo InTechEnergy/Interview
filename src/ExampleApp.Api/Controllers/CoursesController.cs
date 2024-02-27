@@ -70,7 +70,7 @@ public class CoursesController : ControllerBase
     {
         return new CourseModel(course.Id, course.Description)
         {
-            Professor = new ProfessorModel(course.Professor.Id.ToString(), course.Professor.FullName),
+            Professor = new ProfessorModel(course.Lecturer.Id.ToString(), course.Lecturer.FullName),
         };
     }
 }
