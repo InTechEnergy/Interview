@@ -1,4 +1,7 @@
-﻿using ExampleApp.Api.Controllers.Models;
+﻿using CsvHelper;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
@@ -6,6 +9,7 @@ using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -98,4 +102,100 @@ public class StudentsController : ControllerBase
 
         return CreatedAtAction("EnrollStudentInCourse", studentCourse);
     }
+
+
+    [HttpPost("student-enroll-bulk")]
+    public IActionResult UploadFile(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        string contentType = file.ContentType;
+        string extension = Path.GetExtension(file.FileName);
+
+        if (!(contentType == "text/csv" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || contentType == "application/vnd.ms-excel")
+            && !(extension == ".csv" || extension == ".xlsx" || extension == ".xls"))
+        {
+            return BadRequest("Invalid file type. Please upload a CSV or Excel file.");
+        }
+
+        try
+        {
+            if (extension == ".csv")
+            {
+                using var reader = new StreamReader(file.OpenReadStream());
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+                try
+                {
+                    List<StudentEnrollmentCourseBulkRequestModel> records = csv.GetRecords<StudentEnrollmentCourseBulkRequestModel>().ToList();
+
+                    foreach (var record in records)
+                    {
+                    }
+                }
+                catch (Exception)
+                {
+                    return BadRequest("Invalid headers. The CSV file should have headers: StudentName, StudentBadge, CourseId");
+                }
+
+            }
+            if (extension is ".xlsx" or ".xls")
+            {
+                using var stream = file.OpenReadStream();
+                using var document = SpreadsheetDocument.Open(stream, false);
+                var workbookPart = document.WorkbookPart;
+                var sheet = workbookPart.Workbook.Descendants<Sheet>().First();
+                var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+                var rows = worksheetPart.Worksheet.Descendants<Row>();
+
+                List<StudentEnrollmentCourseBulkRequestModel> records = new List<StudentEnrollmentCourseBulkRequestModel>();
+
+                foreach (var row in rows)
+                {
+                    if (row.RowIndex.Value == 1)
+                    {
+                        continue;
+                    }
+
+                    var cells = row.Elements<Cell>().ToList();
+
+                    var record = new StudentEnrollmentCourseBulkRequestModel
+                    {
+                        StudentName = GetCellValue(workbookPart, cells[0]),
+                        StudentBadge = GetCellValue(workbookPart, cells[1]),
+                        CourseId = GetCellValue(workbookPart, cells[2])
+                    };
+
+                    records.Add(record);
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"An error occurred while processing the file: {ex.Message}");
+        }
+
+        return Ok();
+    }
+
+
+    private string? GetCellValue(WorkbookPart workbookPart, Cell cell)
+    {
+        var stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
+        return cell.DataType != null && cell.DataType.Value == CellValues.SharedString
+        ? stringTablePart.SharedStringTable.ChildElements[int.Parse(cell.CellValue.Text)].InnerText
+        : (cell.CellValue?.Text);
+    }
+}
+
+
+public class StudentEnrollmentCourseBulkRequestModel
+{
+    public required string StudentName { get; set; }
+    public required string StudentBadge { get; set; }
+    public required string CourseId { get; set; }
 }
