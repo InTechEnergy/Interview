@@ -9,5 +9,12 @@ internal class Student : ValueObject<Guid>
         FullName = fullName;
     }
 
+    public Student(string fullName, int badge) : this(fullName)
+    {
+        badge = Badge;
+    }
+
     public string FullName { get; private set; }
+
+    public int Badge { get; private set; }
 }

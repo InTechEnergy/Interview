@@ -14,6 +14,6 @@ internal class StudentRepository : IStudentRepository
         _dbContext = dbContext;
     }
 
-    public  async Task<Student> GetByNameAsync(string fullName) => await _dbContext.Students
-        .SingleOrDefaultAsync(s => s.FullName == fullName);
+    public  async Task<Student> GetByNameOrBadgeAsync(string fullName, int badge) => await _dbContext.Students
+        .SingleOrDefaultAsync(s => s.FullName == fullName || s.Badge == badge);
 }

@@ -4,5 +4,5 @@ namespace ExampleApp.Api.Domain.Students.Contracts;
 
 internal interface IStudentRepository
 {
-    Task<Student> GetByNameAsync(string fullName);
+    Task<Student> GetByNameOrBadgeAsync(string fullName, int badge);
 }

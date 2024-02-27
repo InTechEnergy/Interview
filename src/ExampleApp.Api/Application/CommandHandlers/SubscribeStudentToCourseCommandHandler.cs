@@ -27,12 +27,16 @@ internal class SubscribeStudentToCourseCommandHandler : IRequestHandler<Subscrib
     {
         _logger.LogInformation("Subscribing student to course.");
 
+        if (request is { StudentCourse: null or { Student: null } })
+            throw new BusinessException("InvalidRequest", "Invalid request.");
+
         var studentFullName = request.StudentCourse.Student.FullName;
+        var studentBadge = request.StudentCourse.Student.Badge;
         var courseId = request.StudentCourse.CourseId;
 
         _logger.LogInformation("Starting getting student and course.");
 
-        var student = await _studentRepository.GetByNameAsync(studentFullName);
+        var student = await _studentRepository.GetByNameOrBadgeAsync(studentFullName, studentBadge);
 
         var course = await _coursesRepository.GetCourseByIdAsync(courseId);
 
