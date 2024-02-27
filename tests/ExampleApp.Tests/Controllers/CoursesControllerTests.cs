@@ -1,10 +1,11 @@
-using System.Security.Cryptography;
 using ExampleApp.Api.Controllers;
-using Microsoft.Extensions.Logging;
+using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace ExampleApp.Tests;
+namespace ExampleApp.Tests.Controllers;
 
 public class CoursesControllerTests
 {
@@ -25,7 +26,7 @@ public class CoursesControllerTests
             new Course(
                 "test1",
                 "test 1",
-                new Semester
+                new Semester("sem-1")
                 {
                     Description = "sem-1",
                     Start = DateOnly.FromDateTime(DateTime.Today),
@@ -38,7 +39,7 @@ public class CoursesControllerTests
             new Course(
                 "test2",
                 "test 2",
-                new Semester
+                new Semester("sem-1")
                 {
                     Description = "sem-1", Start = DateOnly.FromDateTime(DateTime.Today),
                     End = DateOnly.FromDateTime(DateTime.Today)
@@ -48,48 +49,39 @@ public class CoursesControllerTests
                 DateTimeOffset.Now
             )
         };
-        _mediator.Send(Arg.Any<IRequest<ICollection<Course>>>())
-            .Returns(courses);
+
+        _ = _mediator.Send(Arg.Any<IRequest<ICollection<Course>>>()).Returns(courses);
 
         // Act
-        var response = await new CoursesController(_mediator, _logger).GetCurrent();
+        var actionResult = await new CoursesController(_mediator, _logger).GetCurrent();
 
         // Assert
-        response.Should().HaveCount(2);
-        response.Should()
-            .BeEquivalentTo(
-                new[]
+        _ = actionResult.Should().BeOfType<OkObjectResult>();
+
+        OkObjectResult? okResult = actionResult as OkObjectResult;
+        ResponseCoursesSemesterModel? response = okResult?.Value as ResponseCoursesSemesterModel;
+
+        _ = response.Should().NotBeNull();
+        _ = (response?.Semester?.Courses.Should().HaveCount(2));
+        _ = response.Should().BeEquivalentTo(
+            new ResponseCoursesSemesterModel
+            {
+                Semester = new SemesterCoursesResponseModel("sem-1", "sem-1")
                 {
-                    new
+                    StartDate = DateOnly.FromDateTime(DateTime.Today),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today),
+                    Courses = new List<CourseModel>
                     {
-                        Id = "test1",
-                        Description = "test 1",
-                        Semester = new
+                        new("test1", "test 1")
                         {
-                            Key = default(string?),
-                            Name = "sem-1"
+                            Professor = new ProfessorModel("0", "prof one")
                         },
-                        Professor = new
+                        new("test2", "test 2")
                         {
-                            Key = "0",
-                            Name = "prof one"
-                        }
-                    },
-                    new
-                    {
-                        Id = "test2",
-                        Description = "test 2",
-                        Semester = new
-                        {
-                            Key = default(string?),
-                            Name = "sem-1"
-                        },
-                        Professor = new
-                        {
-                            Key = "0",
-                            Name = "prof one"
+                            Professor = new ProfessorModel("0", "prof one")
                         }
                     }
-                });
+                }
+            });
     }
 }

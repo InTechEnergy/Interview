@@ -21,18 +21,30 @@ public class CoursesController : ControllerBase
     }
 
     [HttpGet(Name = "GetCurrentCourses")]
-    public async Task<IEnumerable<CourseModel>> GetCurrent()
+    public async Task<IActionResult> GetCurrent()
     {
         DateOnly today = new(2023, 9, 1);
         ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
+
+        if(!courses.Any())
+        {
+            return StatusCode(204, new { });
+        }
+
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        return courses.Select(course => new CourseModel(
-            course.Id,
-            course.Description,
-            new KeyNameModel(course.Semester.Id, course.Semester.Description),
-            new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName)
-        )).ToList();
+        Course firstCourse = courses.First();
+        ResponseCoursesSemesterModel response = new()
+        {
+            Semester = new SemesterCoursesResponseModel(firstCourse.Semester.Id, firstCourse.Semester.Description)
+            {
+                StartDate = firstCourse.Semester.Start,
+                EndDate = firstCourse.Semester.End,
+                Courses = courses.Select(CreateCourseModel).ToList()
+            }
+        };
+
+        return Ok(response);
     }
 
     [HttpPatch(Name = "UpdatesProfessor")]
@@ -52,5 +64,13 @@ public class CoursesController : ControllerBase
 
         _ = await _mediator.Send(new UpdateCourseProfessor(existingCourse.Id, professor.Id));
         return Accepted();
+    }
+
+    private static CourseModel CreateCourseModel(Course course)
+    {
+        return new CourseModel(course.Id, course.Description)
+        {
+            Professor = new ProfessorModel(course.Professor.Id.ToString(), course.Professor.FullName),
+        };
     }
 }

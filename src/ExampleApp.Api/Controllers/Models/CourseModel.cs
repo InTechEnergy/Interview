@@ -1,5 +1,10 @@
-using ExampleApp.Api.Domain.Academia;
-
 namespace ExampleApp.Api.Controllers.Models;
 
-public record CourseModel(string Id, string Description, KeyNameModel Semester, KeyNameModel Professor);
+public record CourseModel : KeyNameModel
+{
+    public CourseModel(string key, string name) : base(key, name)
+    {
+    }
+
+    public required ProfessorModel Professor { get; set; }
+}
