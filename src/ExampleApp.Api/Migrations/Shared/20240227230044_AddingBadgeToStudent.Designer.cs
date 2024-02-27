@@ -4,6 +4,7 @@ using ExampleApp.Api.Domain.Academia;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExampleApp.Api.Migrations.Shared
 {
     [DbContext(typeof(AcademiaDbContext))]
-    partial class AcademiaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240227230044_AddingBadgeToStudent")]
+    partial class AddingBadgeToStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
