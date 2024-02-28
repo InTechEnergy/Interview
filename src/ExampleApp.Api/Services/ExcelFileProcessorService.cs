@@ -18,31 +18,42 @@ public class ExcelFileProcessorService : IFileProcessorService
         using var stream = file.OpenReadStream();
         using var document = SpreadsheetDocument.Open(stream, false);
         var workbookPart = document.WorkbookPart;
-        var sheet = workbookPart.Workbook.Descendants<Sheet>().First();
-        var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-        var rows = worksheetPart.Worksheet.Descendants<Row>().ToList();
+        var sheet = workbookPart?.Workbook.Descendants<Sheet>().First();
+        var worksheetPart = (WorksheetPart?)workbookPart?.GetPartById(sheet.Id);
+        var rows = worksheetPart?.Worksheet.Descendants<Row>().ToList();
 
-        var headerCells = rows[0].Elements<Cell>().ToList();
-        var columnIndexByName = new Dictionary<string, int>
-        {
-            { "StudentName", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "StudentName") },
-            { "StudentBadge", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "StudentBadge") },
-            { "CourseId", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "CourseId") }
-        };
+        var headerCells = rows?[0].Elements<Cell>().ToList();
+        var columnIndexByName = headerCells
+            ?.Select((c, i) => new
+                {
+                    ColumnName = GetCellValue(workbookPart, c),
+                    Index = i
+                })
+            ?.ToDictionary(x => x.ColumnName, x => x.Index);
 
-        List<StudentEnrollmentCourseBulkRequestModel> records = new List<StudentEnrollmentCourseBulkRequestModel>();
+        var records = new List<StudentEnrollmentCourseBulkRequestModel>();
 
-        for (int i = 1; i < rows.Count; i++)
+        for (int i = 1; i < rows?.Count; i++)
         {
             var row = rows[i];
             var cells = row.Elements<Cell>().ToList();
 
-            var record = new StudentEnrollmentCourseBulkRequestModel
+            var record = new StudentEnrollmentCourseBulkRequestModel();
+            var recordType = record.GetType();
+
+            foreach (var column in columnIndexByName)
             {
-                StudentName = GetCellValue(workbookPart, cells[columnIndexByName["StudentName"]]),
-                StudentBadge = GetCellValue(workbookPart, cells[columnIndexByName["StudentBadge"]]),
-                CourseId = GetCellValue(workbookPart, cells[columnIndexByName["CourseId"]])
-            };
+                var cell = cells.ElementAtOrDefault(column.Value);
+                if (cell != null)
+                {
+                    string? cellValue = GetCellValue(workbookPart, cell);
+                    var property = recordType.GetProperty(column.Key);
+                    if (property != null && property.CanWrite)
+                    {
+                        property.SetValue(record, Convert.ChangeType(cellValue, property.PropertyType));
+                    }
+                }
+            }
 
             records.Add(record);
         }
