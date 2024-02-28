@@ -15,7 +15,7 @@ internal class DatabaseSeeder
 
     public async Task Seed()
     {
-        var professors = new List<Professor>()
+        var professors = new List<Lecturer>()
         {
             new()
             {

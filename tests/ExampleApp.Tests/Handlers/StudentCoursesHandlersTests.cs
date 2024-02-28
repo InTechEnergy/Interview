@@ -39,7 +39,7 @@ public class StudentCoursesHandlersTests : IClassFixture<TestApplication>
                                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20)),
                                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))
                                 },
-                                professor: new Professor()
+                                lecturer: new Lecturer()
                                 {
                                     FullName = "John Snow"
                                 }
@@ -53,7 +53,7 @@ public class StudentCoursesHandlersTests : IClassFixture<TestApplication>
                                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2)),
                                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))
                                 },
-                                professor: new Professor()
+                                lecturer: new Lecturer()
                                 {
                                     FullName = "Dumbledore"
                                 }
@@ -67,7 +67,7 @@ public class StudentCoursesHandlersTests : IClassFixture<TestApplication>
                                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20)),
                                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5))
                                 },
-                                professor: new Professor()
+                                lecturer: new Lecturer()
                                 {
                                     FullName = "John Snow"
                                 }

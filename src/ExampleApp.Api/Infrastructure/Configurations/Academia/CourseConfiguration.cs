@@ -19,7 +19,7 @@ internal sealed class CourseConfiguration :  IEntityTypeConfiguration<Course>
 
         builder.HasOne(c => c.Semester);
 
-        builder.HasOne(c => c.Professor);
+        builder.HasOne(c => c.Lecturer);
 
         builder.Property(c => c.Description);
 

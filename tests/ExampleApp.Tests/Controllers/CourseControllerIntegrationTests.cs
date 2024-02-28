@@ -31,11 +31,11 @@ public sealed class CourseControllerIntegrationTests : IClassFixture<TestApplica
             End = new DateOnly(1999, 12, 1)
         });
 
-        var professor = new Professor { FullName = "test professor 01" };
+        var professor = new Lecturer { FullName = "test professor 01" };
 
-        _db.Professors.AddRange( professor, new Professor { FullName = "test professor 02", Extension = "02" });
+        _db.Professors.AddRange( professor, new Lecturer { FullName = "test professor 02", Extension = "02" });
 
-        _course = _db.Courses.Add(new Course(Guid.NewGuid(), "Test Course 01", professor: professor, semester: semester.Entity)).Entity;
+        _course = _db.Courses.Add(new Course(Guid.NewGuid(), "Test Course 01", lecturer: professor, semester: semester.Entity)).Entity;
 
         _db.SaveChanges();
     }
@@ -53,13 +53,13 @@ public sealed class CourseControllerIntegrationTests : IClassFixture<TestApplica
         response.Should().BeOfType<AcceptedResult>();
 
         Course? course = await _db.Courses
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .Include(c => c.Semester)
             .FirstOrDefaultAsync(c => c.Id == payload.CourseId);
 
         course.Should().NotBeNull();
-        course.Professor.FullName.Should().Be("test professor 02");
-        course.Professor.Extension.Should().Be("02");
+        course.Lecturer.FullName.Should().Be("test professor 02");
+        course.Lecturer.Extension.Should().Be("02");
     }
 
     [Fact]
@@ -83,12 +83,12 @@ public sealed class CourseControllerIntegrationTests : IClassFixture<TestApplica
             .And.Contain("Invalid course");
 
         Course? course = await _db.Courses
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .Include(c => c.Semester)
             .FirstOrDefaultAsync(c => c.Id == _course.Id);
 
         course.Should().NotBeNull();
-        course.Professor.FullName.Should().Be("test professor 01");
-        course.Professor.Extension.Should().BeNull();
+        course.Lecturer.FullName.Should().Be("test professor 01");
+        course.Lecturer.Extension.Should().BeNull();
     }
 }

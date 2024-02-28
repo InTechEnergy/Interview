@@ -38,7 +38,7 @@ public class CoursesController : ControllerBase
                 .Select(course => new CourseModel(
                     course.Id,
                     course.Description, // Assuming this is needed; adjust if not
-                    new KeyNameModel(course.Professor.Id, course.Professor.FullName)))
+                    new KeyNameModel(course.Lecturer.Id, course.Lecturer.FullName)))
                 .ToList()))
             .ToList();
     }

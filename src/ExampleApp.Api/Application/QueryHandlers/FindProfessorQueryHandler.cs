@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExampleApp.Api.Domain.Academia.QueryHandlers;
 
-internal class FindProfessorQueryHandler : IRequestHandler<FindProfessorByNamedQuery, Professor?>
+internal class FindProfessorQueryHandler : IRequestHandler<FindProfessorByNamedQuery, Lecturer?>
 {
     private readonly AcademiaDbContext _context;
 
@@ -13,7 +13,7 @@ internal class FindProfessorQueryHandler : IRequestHandler<FindProfessorByNamedQ
         _context = context;
     }
 
-    public async Task<Professor?> Handle(FindProfessorByNamedQuery request, CancellationToken cancellationToken)
+    public async Task<Lecturer?> Handle(FindProfessorByNamedQuery request, CancellationToken cancellationToken)
         => await _context.Professors
             .SingleOrDefaultAsync(c => c.FullName == request.Name, cancellationToken);
 }

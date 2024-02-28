@@ -8,12 +8,12 @@ internal class Course : AggregateRoot<Guid>
         Guid id,
         string description,
         Semester semester,
-        Professor professor)
+        Lecturer lecturer)
     {
         Id = id;
         Description = description;
         Semester = semester;
-        Professor = professor;
+        Lecturer = lecturer;
     }
 
     /// <summary>
@@ -26,11 +26,11 @@ internal class Course : AggregateRoot<Guid>
     }
     public string Description { get; init; }
     public Semester Semester { get; protected init; }
-    public Professor Professor { get; protected set; }
+    public Lecturer Lecturer { get; protected set; }
 
-    public void UpdateProfessor(Professor newProfessor)
+    public void UpdateProfessor(Lecturer newLecturer)
     {
-        Professor = newProfessor ?? throw new ArgumentNullException(nameof(newProfessor));
+        Lecturer = newLecturer ?? throw new ArgumentNullException(nameof(newLecturer));
     }
 
     public bool IsCurrentOnSemester()

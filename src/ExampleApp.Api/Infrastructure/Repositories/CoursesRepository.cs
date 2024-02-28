@@ -43,7 +43,7 @@ internal sealed class CoursesRepository : ICoursesRepository
     }
 
     public Task<Course> GetCourseByIdAsync(Guid courseId) => _dbContext.Courses
-        .Include(c => c.Professor)
+        .Include(c => c.Lecturer)
         .Include(c => c.Semester)
         .SingleOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted);
 

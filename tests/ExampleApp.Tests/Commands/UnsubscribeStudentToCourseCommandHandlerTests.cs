@@ -33,7 +33,7 @@ public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<TestA
                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))
                 },
-                professor: new Professor()
+                lecturer: new Lecturer()
                 {
                     FullName = "Professor Math"
                 }));

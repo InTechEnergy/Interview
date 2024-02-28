@@ -60,7 +60,7 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<BaseTes
                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))
                 },
-                professor: new Professor()
+                lecturer: new Lecturer()
                 {
                     FullName = "Professor Math"
                 }));
@@ -95,7 +95,7 @@ public class SubscribeStudentToCourseCommandHandlerTests : IClassFixture<BaseTes
                     Start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2)),
                     End = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))
                 },
-                professor: new Professor()
+                lecturer: new Lecturer()
                 {
                     FullName = "Professor Math"
                 }));

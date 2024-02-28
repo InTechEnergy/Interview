@@ -14,7 +14,7 @@ internal class AcademiaDbContext : DbContext, IDbContext
     }
 
     internal DbSet<Course> Courses { get; set; }
-    internal DbSet<Professor> Professors { get; set; }
+    internal DbSet<Lecturer> Professors { get; set; }
     internal DbSet<Semester> Semesters { get; set; }
     internal DbSet<Student> Students { get; set; } 
     internal DbSet<StudentCourses> StudentCourses { get; set; }

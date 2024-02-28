@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ExampleApp.Api.Infrastructure.Configurations.Academia;
 
-internal sealed class ProfessorConfiguration :  IEntityTypeConfiguration<Professor>
+internal sealed class ProfessorConfiguration :  IEntityTypeConfiguration<Lecturer>
 {
-    public void Configure(EntityTypeBuilder<Professor> builder)
+    public void Configure(EntityTypeBuilder<Lecturer> builder)
     {
         builder.ToTable("Professors");
 
