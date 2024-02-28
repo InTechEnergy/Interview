@@ -9,60 +9,42 @@ using Microsoft.Extensions.Logging;
 
 namespace ExampleApp.Tests;
 
-public class CourseControllerIntegrationTests : IClassFixture<DatabaseFixture>, IDisposable
+public sealed class CourseControllerIntegrationTests : IClassFixture<TestApplication>
 {
-    private readonly AcademiaDbContext _db;
-    private readonly CoursesController _controller;
+    private AcademiaDbContext _db;
+    private CoursesController _controller;
+    private Course _course;
+    private TestApplication _fixture;
 
-    public CourseControllerIntegrationTests(DatabaseFixture fixture)
+    public CourseControllerIntegrationTests(TestApplication testApplication)
     {
-        var mediator = (IMediator)fixture.Services.GetService(typeof(IMediator))!;
-        var logger = (ILogger<CoursesController>)fixture.Services.GetService(typeof(ILogger<CoursesController>))!;
+        _fixture = testApplication;
+        var mediator = (IMediator)testApplication.Services.GetService(typeof(IMediator))!;
+        var logger = (ILogger<CoursesController>)testApplication.Services.GetService(typeof(ILogger<CoursesController>))!;
         _controller = new CoursesController(mediator, logger);
-        _db = (AcademiaDbContext)fixture.Services.GetService(typeof(AcademiaDbContext))!;
+        _db = (AcademiaDbContext)testApplication.Services.GetService(typeof(AcademiaDbContext))!;
 
-        // remove previous values, in case there were left by an aborted debug session
-        Dispose();
+        var semester = _db.Semesters.Add(new Semester()
+        {
+            Description = "Test Semester 01",
+            Start = new DateOnly(1999, 1, 1),
+            End = new DateOnly(1999, 12, 1)
+        });
 
-        // create records available for all tests
-        _db.Database.ExecuteSql(
-            $@"INSERT INTO [example-db].dbo.Semesters
-  (Id, Description, StartDate, EndDate)
-  VALUES
-    ('tst-01', 'Test Semester 01', '1999-01-01', '1999-12-01');
-INSERT INTO [example-db].dbo.Professors
-  (FullName, Extension)
-  VALUES
-    ('test professor 01', null),
-    ('test professor 02', '02');
-INSERT INTO [example-db].dbo.Courses
-  (Id, Description, ProfessorId, SemesterId)
-SELECT
-    'TEST-01' [Id],
-    'Test Course 01' [Description],
-    p.Id ProfessorId,
-    'tst-01' SemesterId
-FROM [example-db].dbo.Professors p
-WHERE FullName = 'test professor 01';
-");
-    }
+        var professor = new Professor { FullName = "test professor 01" };
 
-    public void Dispose()
-    {
-        // clean up after tests
-        _db.Database.ExecuteSql(
-            $@"
-DELETE FROM [example-db].dbo.Courses WHERE Id = 'TEST-01';
-DELETE FROM [example-db].dbo.Professors WHERE FullName like 'test professor 0%';
-DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
-            ");
+        _db.Professors.AddRange( professor, new Professor { FullName = "test professor 02", Extension = "02" });
+
+        _course = _db.Courses.Add(new Course(Guid.NewGuid(), "Test Course 01", professor: professor, semester: semester.Entity)).Entity;
+
+        _db.SaveChanges();
     }
 
     [Fact]
     public async Task UpdatesProfessor()
     {
         // Arrange
-        ProfessorUpdateModel payload = new(Guid.NewGuid(), "test professor 02");
+        ProfessorUpdateModel payload = new(_course.Id, "test professor 02");
 
         // Act
         var response = await _controller.UpdateProfessor(payload);
@@ -98,12 +80,12 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
 
         message.Should()
             .NotBeNull()
-            .And.Be("Invalid course TEST-00");
+            .And.Contain("Invalid course");
 
         Course? course = await _db.Courses
             .Include(c => c.Professor)
             .Include(c => c.Semester)
-            .FirstOrDefaultAsync(c => c.Id == payload.CourseId);
+            .FirstOrDefaultAsync(c => c.Id == _course.Id);
 
         course.Should().NotBeNull();
         course.Professor.FullName.Should().Be("test professor 01");

@@ -7,15 +7,13 @@ using FluentAssertions;
 
 namespace ExampleApp.Tests.Commands;
 
-public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<DatabaseFixture>
+public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<TestApplication>, IDisposable
 {
-    private readonly AcademiaDbContext _dbContext;
-    private readonly IMediator _mediator;
+    private readonly TestApplication _testApplication;
 
-    public UnsubscribeStudentToCourseCommandHandlerTests(DatabaseFixture fixture)
+    public UnsubscribeStudentToCourseCommandHandlerTests(TestApplication testApplication)
     {
-        _dbContext = fixture.Db;
-        _mediator = fixture.Mediator;
+        _testApplication = testApplication;
     }
 
     [Fact]
@@ -23,9 +21,9 @@ public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<Datab
     {
         var courseId = Guid.NewGuid();
 
-        var student = _dbContext.Students.Add(new Student("New student 1"));
+        var student = _testApplication.DbContext.Students.Add(new Student("New student 1"));
 
-        var courseEntity = _dbContext.Courses.Add(
+        var courseEntity = _testApplication.DbContext.Courses.Add(
             new Course(
                 id: courseId,
                 description: "Philosophy",
@@ -40,7 +38,7 @@ public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<Datab
                     FullName = "Professor Math"
                 }));
 
-        _dbContext.StudentCourses.Add(
+        _testApplication.DbContext.StudentCourses.Add(
             new StudentCourses(
                 student.Entity,
                 new List<Course>()
@@ -48,16 +46,21 @@ public class UnsubscribeStudentToCourseCommandHandlerTests : IClassFixture<Datab
                     courseEntity.Entity
                 }));
 
-        await _dbContext.SaveChangesAsync();
+        await _testApplication.DbContext.SaveChangesAsync();
 
         var command = new UnsubscribeStudentToCourseCommand(new StudentToCourseModel(courseId, new StudentModel("New student 1", 1)) );
 
-        var (response, _, _) = await _mediator.Send(command);
+        var (response, _, _) = await _testApplication.Mediator.Send(command);
 
-        var course = _dbContext.StudentCourses.SingleOrDefault(x => x.StudentId == student.Entity.Id);
+        var course = _testApplication.DbContext.StudentCourses.SingleOrDefault(x => x.StudentId == student.Entity.Id);
 
         response.Should().BeTrue();
 
         course.Courses.FirstOrDefault().IsDeleted.Should().BeTrue();
+    }
+
+    public void Dispose()
+    {
+        _testApplication.ResetDatabase();
     }
 }

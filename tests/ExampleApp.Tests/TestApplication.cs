@@ -8,27 +8,20 @@ using Respawn;
 
 namespace ExampleApp.Tests;
 
-
 [CollectionDefinition(nameof(TestApplicationCollection))]
-public class TestApplicationCollection : ICollectionFixture<DatabaseFixture>
+public class TestApplicationCollection : ICollectionFixture<TestApplication>
 {
 }
 
-public class DatabaseFixture : IAsyncLifetime
+public class TestApplication : IAsyncLifetime
 {
-    private AcademiaDbContext? _db;
-
-    private Respawner _respawner = default!;
-
-    private SqlConnection _dbConnection = default!;
-
     public ServiceProvider Services { get; protected set; }
-
     public IConfigurationRoot Configuration { get; protected set; }
+    public IMediator Mediator { get; protected set; }
+    internal AcademiaDbContext DbContext { get; set; }
 
-    internal AcademiaDbContext Db => _db;
-
-    internal IMediator Mediator;
+    private SqlConnection _dbConnection;
+    private Respawner _respawner = default!;
 
     public async Task InitializeAsync()
     {
@@ -40,10 +33,11 @@ public class DatabaseFixture : IAsyncLifetime
         var services = new ServiceCollection()
             .AddHttpClient();
 
+
         services.AddServices(Configuration);
         Services = services.BuildServiceProvider();
 
-        _db = Services.GetService<AcademiaDbContext>();
+        DbContext = Services.GetService<AcademiaDbContext>();
         Mediator = Services.GetService<IMediator>();
 
         _dbConnection = new SqlConnection(Configuration.GetConnectionString("Default"));
@@ -51,9 +45,14 @@ public class DatabaseFixture : IAsyncLifetime
         await SetupDatabase();
     }
 
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     private async Task SetupDatabase()
     {
-        await _db.Database.MigrateAsync();
+        await DbContext.Database.MigrateAsync();
         await _dbConnection.OpenAsync();
         _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions {
             DbAdapter = DbAdapter.SqlServer,
@@ -73,16 +72,5 @@ public class DatabaseFixture : IAsyncLifetime
     public async Task ResetDatabase()
     {
         await _respawner.ResetAsync(_dbConnection);
-    }
-
-    public Task DisposeAsync()
-    {
-        _dbConnection.Dispose();
-        _db?.Dispose();
-        Services.Dispose();
-
-        _respawner.ResetAsync(_dbConnection);
-
-        return default;
     }
 }

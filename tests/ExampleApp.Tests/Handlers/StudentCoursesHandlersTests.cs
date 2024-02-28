@@ -10,17 +10,13 @@ using FluentAssertions;
 
 namespace ExampleApp.Tests.Handlers;
 
-public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisposable, IAsyncDisposable
+public class StudentCoursesHandlersTests : IClassFixture<TestApplication>
 {
-    private AcademiaDbContext _dbContext;
-    private IMediator _mediator;
-    private DatabaseFixture _fixture;
+    private TestApplication _testApplication;
 
-    public StudentCoursesHandlersTests(DatabaseFixture fixture)
+    public StudentCoursesHandlersTests(TestApplication testApplication)
     {
-        _dbContext = fixture.Db;
-        _mediator = fixture.Mediator;
-        _fixture = fixture;
+        _testApplication = testApplication;
     }
 
     [Fact]
@@ -80,10 +76,10 @@ public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisp
                     )
                 };
 
-        await _dbContext.StudentCourses.AddRangeAsync(studentCourses);
-        await _dbContext.SaveChangesAsync();
+        await _testApplication.DbContext.StudentCourses.AddRangeAsync(studentCourses);
+        await _testApplication.DbContext.SaveChangesAsync();
 
-        var result = await _mediator.Send(new GetStudentCoursesByCurrentSemesterQuery());
+        var result = await _testApplication.Mediator.Send(new GetStudentCoursesByCurrentSemesterQuery());
 
         var studentCourseViews = result.Value;
         var courseIds = studentCourseViews.Select(x => x.CourseIds);
@@ -98,15 +94,5 @@ public class StudentCoursesHandlersTests : IClassFixture<DatabaseFixture>, IDisp
 
         courseIds.Should().HaveCount(1);
         courseIds.FirstOrDefault().Should().Contain(courseGuidRegisteredSemester);
-    }
-
-    public void Dispose()
-    {
-        _fixture.DisposeAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _dbContext.DisposeAsync();
     }
 }
