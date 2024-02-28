@@ -20,25 +20,28 @@ public class ExcelFileProcessorService : IFileProcessorService
         var workbookPart = document.WorkbookPart;
         var sheet = workbookPart.Workbook.Descendants<Sheet>().First();
         var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-        var rows = worksheetPart.Worksheet.Descendants<Row>();
+        var rows = worksheetPart.Worksheet.Descendants<Row>().ToList();
+
+        var headerCells = rows[0].Elements<Cell>().ToList();
+        var columnIndexByName = new Dictionary<string, int>
+        {
+            { "StudentName", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "StudentName") },
+            { "StudentBadge", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "StudentBadge") },
+            { "CourseId", headerCells.FindIndex(c => GetCellValue(workbookPart, c) == "CourseId") }
+        };
 
         List<StudentEnrollmentCourseBulkRequestModel> records = new List<StudentEnrollmentCourseBulkRequestModel>();
 
-        foreach (var row in rows)
+        for (int i = 1; i < rows.Count; i++)
         {
-            // Skip the header row
-            if (row.RowIndex.Value == 1)
-            {
-                continue;
-            }
-
+            var row = rows[i];
             var cells = row.Elements<Cell>().ToList();
 
             var record = new StudentEnrollmentCourseBulkRequestModel
             {
-                StudentName = GetCellValue(workbookPart, cells[0]),
-                StudentBadge = GetCellValue(workbookPart, cells[1]),
-                CourseId = GetCellValue(workbookPart, cells[2])
+                StudentName = GetCellValue(workbookPart, cells[columnIndexByName["StudentName"]]),
+                StudentBadge = GetCellValue(workbookPart, cells[columnIndexByName["StudentBadge"]]),
+                CourseId = GetCellValue(workbookPart, cells[columnIndexByName["CourseId"]])
             };
 
             records.Add(record);
