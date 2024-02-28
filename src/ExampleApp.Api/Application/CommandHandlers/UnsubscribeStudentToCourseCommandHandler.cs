@@ -43,8 +43,8 @@ internal class UnsubscribeStudentToCourseCommandHandler  : IRequestHandler<Unsub
         if (student is null || course is null)
             throw new EntityNotFoundException();
 
-        if (!course.IsCurrentOnSemester())
-            throw new BusinessException("SemesterNotCurrent", "Course semester is not current.");
+        if (!course.IsNotPast())
+            throw new BusinessException("SemesterIsPast", "Course semester is not current.");
 
         await _coursesRepository.UnsubscribeStudentFromCourseAsync(course, student);
 

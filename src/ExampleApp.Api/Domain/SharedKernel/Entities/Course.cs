@@ -39,4 +39,11 @@ internal class Course : AggregateRoot<Guid>
 
         return Semester.Start <= date && Semester.End >= date;
     }
+
+    public bool IsNotPast()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return Semester.End >= today;
+    }
 }
