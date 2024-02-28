@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using ExampleApp.Api.Controllers.Models;
+﻿using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
@@ -125,7 +123,7 @@ public class StudentsController : ControllerBase
 
         try
         {
-            List<StudentEnrollmentCourseBulkRequestModel> records = processor.Process(file);
+            List<StudentEnrollmentCourseBulkRequestModel> records = processor.Process<StudentEnrollmentCourseBulkRequestModel>(file);
 
         }
         catch (Exception ex)
@@ -135,21 +133,4 @@ public class StudentsController : ControllerBase
 
         return Ok();
     }
-
-
-    private string? GetCellValue(WorkbookPart workbookPart, Cell cell)
-    {
-        var stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
-        return cell.DataType != null && cell.DataType.Value == CellValues.SharedString
-        ? stringTablePart.SharedStringTable.ChildElements[int.Parse(cell.CellValue.Text)].InnerText
-        : (cell.CellValue?.Text);
-    }
-}
-
-
-public class StudentEnrollmentCourseBulkRequestModel
-{
-    public string? StudentName { get; set; }
-    public string? StudentBadge { get; set; }
-    public string? CourseId { get; set; }
 }

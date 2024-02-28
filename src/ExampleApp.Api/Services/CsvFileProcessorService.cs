@@ -1,5 +1,4 @@
 ﻿using CsvHelper;
-using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Interfaces;
 using System.Globalization;
 
@@ -12,10 +11,10 @@ public class CsvFileProcessorService : IFileProcessorService
         return contentType == "text/csv" && extension == ".csv";
     }
 
-    public List<StudentEnrollmentCourseBulkRequestModel> Process(IFormFile file)
+    public List<T> Process<T>(IFormFile file) where T : class, new()
     {
         using var reader = new StreamReader(file.OpenReadStream());
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-        return csv.GetRecords<StudentEnrollmentCourseBulkRequestModel>().ToList();
+        return csv.GetRecords<T>().ToList();
     }
 }

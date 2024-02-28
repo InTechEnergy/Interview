@@ -1,6 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Interfaces;
 
 namespace ExampleApp.Api.Services;
@@ -13,59 +12,82 @@ public class ExcelFileProcessorService : IFileProcessorService
             && (extension == ".xlsx" || extension == ".xls");
     }
 
-    public List<StudentEnrollmentCourseBulkRequestModel> Process(IFormFile file)
+    public List<T> Process<T>(IFormFile file) where T : class, new()
     {
         using var stream = file.OpenReadStream();
         using var document = SpreadsheetDocument.Open(stream, false);
         var workbookPart = document.WorkbookPart;
-        var sheet = workbookPart?.Workbook.Descendants<Sheet>().First();
-        var worksheetPart = (WorksheetPart?)workbookPart?.GetPartById(sheet.Id);
-        var rows = worksheetPart?.Worksheet.Descendants<Row>().ToList();
+        var rows = GetRows(workbookPart);
+        var columnIndexByName = GetColumnIndexByName(workbookPart, rows[0]);
 
-        var headerCells = rows?[0].Elements<Cell>().ToList();
-        var columnIndexByName = headerCells
-            ?.Select((c, i) => new
-                {
-                    ColumnName = GetCellValue(workbookPart, c),
-                    Index = i
-                })
-            ?.ToDictionary(x => x.ColumnName, x => x.Index);
+        var records = new List<T>();
 
-        var records = new List<StudentEnrollmentCourseBulkRequestModel>();
-
-        for (int i = 1; i < rows?.Count; i++)
+        for (int i = 1; i < rows.Count; i++)
         {
-            var row = rows[i];
-            var cells = row.Elements<Cell>().ToList();
-
-            var record = new StudentEnrollmentCourseBulkRequestModel();
-            var recordType = record.GetType();
-
-            foreach (var column in columnIndexByName)
-            {
-                var cell = cells.ElementAtOrDefault(column.Value);
-                if (cell != null)
-                {
-                    string? cellValue = GetCellValue(workbookPart, cell);
-                    var property = recordType.GetProperty(column.Key);
-                    if (property != null && property.CanWrite)
-                    {
-                        property.SetValue(record, Convert.ChangeType(cellValue, property.PropertyType));
-                    }
-                }
-            }
-
+            var record = CreateRecord<T>(workbookPart, rows[i], columnIndexByName);
             records.Add(record);
         }
 
         return records;
     }
 
-    private string? GetCellValue(WorkbookPart workbookPart, Cell cell)
+    private List<Row>? GetRows(WorkbookPart workbookPart)
     {
-        var stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
-        return cell.DataType != null && cell.DataType.Value == CellValues.SharedString
-        ? stringTablePart.SharedStringTable.ChildElements[int.Parse(cell.CellValue.Text)].InnerText
-        : (cell.CellValue?.Text);
+        var sheet = workbookPart?.Workbook.Descendants<Sheet>().First();
+        var worksheetPart = (WorksheetPart?)workbookPart?.GetPartById(sheet.Id);
+        return worksheetPart?.Worksheet.Descendants<Row>().ToList();
+    }
+
+    private Dictionary<string, int> GetColumnIndexByName(WorkbookPart workbookPart, Row headerRow)
+    {
+        var headerCells = headerRow.Elements<Cell>().ToList();
+        return headerCells
+            .Select((c, i) => new
+            {
+                ColumnName = GetCellValue(workbookPart, c),
+                Index = i
+            })
+            .Where(x => x.ColumnName != null)
+            .ToDictionary(x => x.ColumnName, x => x.Index);
+    }
+
+    private static T CreateRecord<T>(WorkbookPart workbookPart, Row row, Dictionary<string, int> columnIndexByName) where T : class, new()
+    {
+        var cells = row.Elements<Cell>().ToList();
+        var record = new T();
+        var recordType = record.GetType();
+
+        foreach (var column in columnIndexByName)
+        {
+            var cell = cells.ElementAtOrDefault(column.Value);
+            if (cell != null)
+            {
+                string? cellValue = GetCellValue(workbookPart, cell);
+                var property = recordType.GetProperty(column.Key);
+                if (property != null && property.CanWrite)
+                {
+                    property.SetValue(record, Convert.ChangeType(cellValue, property.PropertyType));
+                }
+            }
+        }
+
+        return record;
+    }
+
+    private static string GetCellValue(WorkbookPart workbookPart, Cell cell)
+    {
+        string value = cell.InnerText;
+
+        if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
+        {
+            var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
+
+            if (stringTable != null)
+            {
+                value = stringTable.SharedStringTable.ElementAt(int.Parse(value)).InnerText;
+            }
+        }
+
+        return value;
     }
 }
