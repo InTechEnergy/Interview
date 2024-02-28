@@ -1,4 +1,5 @@
-﻿using ExampleApp.Api.Controllers.Models;
+﻿using ExampleApp.Api.Common;
+using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
@@ -18,18 +19,21 @@ public class StudentsController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<StudentsController> _logger;
+    private readonly IBulkService _bulkService;
     private readonly ICoursesService _coursesService;
     private readonly List<IFileProcessorService> _fileProcessors;
     private readonly IValidationsService _validationsService;
 
     public StudentsController(IMediator mediator,
         ILogger<StudentsController> logger,
+        IBulkService bulkService,
         ICoursesService coursesService,
         IEnumerable<IFileProcessorService> fileProcessors,
         IValidationsService validationsService)
     {
         _mediator = mediator;
         _logger = logger;
+        _bulkService = bulkService;
         _coursesService = coursesService;
         _fileProcessors = fileProcessors.ToList();
         _validationsService = validationsService;
@@ -102,9 +106,13 @@ public class StudentsController : ControllerBase
         return CreatedAtAction("EnrollStudentInCourse", studentCourse);
     }
 
-
+    /// <summary>
+    /// Student enroll bulk.
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
     [HttpPost("student-enroll-bulk")]
-    public IActionResult UploadFile(IFormFile file)
+    public async Task<IActionResult> StudentEnrrollBulk(IFormFile file)
     {
         if (file == null || file.Length == 0)
         {
@@ -114,17 +122,17 @@ public class StudentsController : ControllerBase
         string contentType = file.ContentType;
         string extension = Path.GetExtension(file.FileName);
 
-        var processor = _fileProcessors.FirstOrDefault(p => p.CanProcess(contentType, extension));
+        IFileProcessorService? processor = _fileProcessors.FirstOrDefault(p => p.CanProcess(contentType, extension));
 
         if (processor == null)
         {
-            return BadRequest("Invalid file type. Please upload a CSV or Excel file.");
+            return BadRequest(Constants.INVALID_FILE_TYPE);
         }
 
         try
         {
             List<StudentEnrollmentCourseBulkRequestModel> records = processor.Process<StudentEnrollmentCourseBulkRequestModel>(file);
-
+            await _bulkService.BulkInsertStudents(records);
         }
         catch (Exception ex)
         {

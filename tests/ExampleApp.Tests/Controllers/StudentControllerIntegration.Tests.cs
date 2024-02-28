@@ -17,16 +17,20 @@ public class StudentsControllerIntegrationTests : IClassFixture<DatabaseFixture>
     {
         var mediator = (IMediator)fixture.Services.GetService(typeof(IMediator))!;
         var logger = (ILogger<StudentsController>)fixture.Services.GetService(typeof(ILogger<StudentsController>))!;
+        var bulkService = (IBulkService)fixture.Services.GetService(typeof(IBulkService))!;
         var coursesService = (ICoursesService)fixture.Services.GetService(typeof(ICoursesService))!;
+        var fileprocessorService = (IFileProcessorService)fixture.Services.GetService(typeof(IFileProcessorService))!;
         var validationsService = (IValidationsService)fixture.Services.GetService(typeof(IValidationsService))!;
 
-        _controller = new StudentsController(mediator, logger, coursesService, validationsService);
+        List<IFileProcessorService> fileProcessors = new() { fileprocessorService };
+
+        _controller = new StudentsController(mediator, logger, bulkService, coursesService, fileProcessors, validationsService);
         _db = (AcademiaDbContext)fixture.Services.GetService(typeof(AcademiaDbContext))!;
 
-        Dispose();
+        ((IDisposable)this).Dispose();
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
     }
 

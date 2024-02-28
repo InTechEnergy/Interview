@@ -15,7 +15,10 @@ public class StudentsControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock;
     private readonly Mock<ILogger<StudentsController>> _loggerMock;
+    private readonly Mock<IBulkService> _bulkServiceMock;
     private readonly Mock<ICoursesService> _coursesServiceMock;
+    private readonly Mock<IFileProcessorService> _fileProcessorServiceMock;
+    private readonly List<IFileProcessorService> _fileProcessors;
     private readonly Mock<IValidationsService> _validationsServiceMock;
     private readonly StudentsController _controller;
 
@@ -23,9 +26,13 @@ public class StudentsControllerTests
     {
         _mediatorMock = new Mock<IMediator>();
         _loggerMock = new Mock<ILogger<StudentsController>>();
+        _bulkServiceMock = new Mock<IBulkService>();
         _coursesServiceMock = new Mock<ICoursesService>();
+        _fileProcessorServiceMock = new Mock<IFileProcessorService>();
         _validationsServiceMock = new Mock<IValidationsService>();
-        _controller = new StudentsController(_mediatorMock.Object, _loggerMock.Object, _coursesServiceMock.Object, _validationsServiceMock.Object);
+        _fileProcessors = new() { _fileProcessorServiceMock.Object };
+
+        _controller = new StudentsController(_mediatorMock.Object, _loggerMock.Object, _bulkServiceMock.Object, _coursesServiceMock.Object, _fileProcessors, _validationsServiceMock.Object);
     }
 
     [Fact]
@@ -73,7 +80,7 @@ public class StudentsControllerTests
             .Setup(vs => vs.CheckErrorsAsync(It.IsAny<StudentEnrollmentCourseRequestModel>(), It.IsAny<ModelStateDictionary>()))
             .Returns(new List<ModelStateError>());
 
-        StudentsController controller = new(_mediatorMock.Object, _loggerMock.Object, _coursesServiceMock.Object, _validationsServiceMock.Object);
+        StudentsController controller = new(_mediatorMock.Object, _loggerMock.Object, _bulkServiceMock.Object, _coursesServiceMock.Object, _fileProcessors, _validationsServiceMock.Object);
         controller.ModelState.AddModelError("TestError", "Invalid model state");
         StudentEnrollmentCourseRequestModel request = new();
         IActionResult result = await controller.EnrollStudentInCourse(request);

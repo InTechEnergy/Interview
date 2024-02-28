@@ -15,14 +15,29 @@ VALUES
 	('course1', 'Math', 1, 1, GETDATE(), GETDATE()),
 	('course2', 'English', 2, 2, GETDATE(), GETDATE()),
 	('course3', 'Spanish', 3, 1, GETDATE(), GETDATE()),
-	('course4', 'French', 3, 2, GETDATE(), GETDATE());
+	('course4', 'French', 3, 2, GETDATE(), GETDATE()),
+	('course5', 'Physics', 1, 2, GETDATE(), GETDATE()),
+	('course6', 'Chemistry', 2, 3, GETDATE(), GETDATE()),
+    ('course7', 'Biology', 2, 4, GETDATE(), GETDATE());
+
+
 
 INSERT INTO Students (FullName, Badge, ResidentStatus)
 VALUES
 	('Sevann Radhak', 'A123', 1),
 	('Dylan Rametta', 'A456', 2),
 	('Melman Arigato', 'B001', 3),
-	('Marty Pelagato', 'B002', 3);
+	('Marty Pelagato', 'B002', 3),
+	('John Doe', 'Badge1001', 1),
+    ('Jane Smith', 'Badge1002', 2),
+    ('Robert Johnson', 'Badge1003', 3),
+    ('Michael Williams', 'Badge1004', 1),
+    ('Sarah Brown', 'Badge1005', 2),
+    ('Emily Davis', 'Badge1006', 3),
+    ('Daniel Miller', 'Badge1007', 1),
+    ('Emma Wilson', 'Badge1008', 2),
+    ('David Moore', 'Badge1009', 3),
+    ('Sophia Taylor', 'Badge1010', 1);
 
 DECLARE @StudentId1 INT;
 DECLARE @StudentId2 INT;

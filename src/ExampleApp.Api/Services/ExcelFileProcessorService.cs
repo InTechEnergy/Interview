@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using ExampleApp.Api.Interfaces;
+using System.Reflection;
 
 namespace ExampleApp.Api.Services;
 
@@ -31,7 +32,7 @@ public class ExcelFileProcessorService : IFileProcessorService
         return records;
     }
 
-    private List<Row>? GetRows(WorkbookPart workbookPart)
+    private static List<Row>? GetRows(WorkbookPart workbookPart)
     {
         var sheet = workbookPart?.Workbook.Descendants<Sheet>().First();
         var worksheetPart = (WorksheetPart?)workbookPart?.GetPartById(sheet.Id);
@@ -44,7 +45,7 @@ public class ExcelFileProcessorService : IFileProcessorService
         return headerCells
             .Select((c, i) => new
             {
-                ColumnName = GetCellValue(workbookPart, c),
+                ColumnName = GetCellValue(workbookPart, c).ToLower(),
                 Index = i
             })
             .Where(x => x.ColumnName != null)
@@ -63,7 +64,7 @@ public class ExcelFileProcessorService : IFileProcessorService
             if (cell != null)
             {
                 string? cellValue = GetCellValue(workbookPart, cell);
-                var property = recordType.GetProperty(column.Key);
+                var property = recordType.GetProperty(column.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (property != null && property.CanWrite)
                 {
                     property.SetValue(record, Convert.ChangeType(cellValue, property.PropertyType));
