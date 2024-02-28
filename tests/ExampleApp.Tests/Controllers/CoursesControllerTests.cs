@@ -1,9 +1,11 @@
 using System.Security.Cryptography;
 using ExampleApp.Api.Controllers;
+using ExampleApp.Api.Controllers.Models;
 using Microsoft.Extensions.Logging;
 using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.SharedKernel.Entities;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExampleApp.Tests;
 
@@ -53,13 +55,11 @@ public class CoursesControllerTests
 
         // Act
         var response = await new CoursesController(_mediator, _logger).GetCurrent();
-
+        var result = (response.Result as OkObjectResult).Value as SemesterModel;
         // Assert
-        response.Should().HaveCount(2);
-        response.Should()
+
+        result.Should()
             .BeEquivalentTo(
-                new[]
-                {
                     new
                     {
                         Key = Guid.Empty,
@@ -77,17 +77,7 @@ public class CoursesControllerTests
                                     Key = Guid.Empty,
                                     Name = "prof one"
                                 }
-                            }
-                        }
-                    },
-                    new
-                    {
-                        Key = Guid.Empty,
-                        Name = "sem-2",
-                        StartDate = DateOnly.FromDateTime(DateTime.Today),
-                        EndDate = DateOnly.FromDateTime(DateTime.Today),
-                        Courses = new[]
-                        {
+                            },
                             new
                             {
                                 Key = courseGuid2,
@@ -99,7 +89,6 @@ public class CoursesControllerTests
                                 }
                             }
                         }
-                    }
-                });
+                    });
     }
 }
