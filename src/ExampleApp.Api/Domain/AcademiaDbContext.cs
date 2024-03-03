@@ -1,7 +1,9 @@
+using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExampleApp.Api.Domain.Academia;
+namespace ExampleApp.Api.Domain;
 
 internal class AcademiaDbContext : DbContext
 {
@@ -12,6 +14,8 @@ internal class AcademiaDbContext : DbContext
     internal DbSet<Course> Courses { get; set; }
     internal DbSet<Professor> Professors { get; set; }
     internal DbSet<Semester> Semesters { get; set; }
+    internal DbSet<Student> Students { get; set; }
+    internal DbSet<StudentCourse> StudentCourses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

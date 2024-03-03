@@ -1,4 +1,4 @@
-using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

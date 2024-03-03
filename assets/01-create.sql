@@ -82,3 +82,25 @@ INSERT INTO [example-db].dbo.Courses
     ('POT-101-23', 'Potions - 101; ''23', 1, '2023-2'),
     ('TLP-201-23', 'Telepathy, Advanced; ''23', 2, '2023-2')
 ;
+
+CREATE TABLE [example-db].dbo.StudentCourses (
+    Id INTEGER PRIMARY KEY IDENTITY,
+    StudentId VARCHAR(20) NOT NULL,
+    CourseId VARCHAR(20) NULL,
+    CONSTRAINT PK_StudentCourses PRIMARY KEY (Id),
+    CONSTRAINT FK_StudentCourses_Courses_CourseId FOREIGN KEY (CourseId) REFERENCES Courses(Id),
+    CONSTRAINT FK_StudentCourses_Students_StudentId FOREIGN KEY (StudentId) REFERENCES Students(Id) ON DELETE CASCADE
+)
+;
+
+DECLARE @StudentId1 INT;
+DECLARE @StudentId2 INT;
+SELECT @StudentId1 = Id FROM Students WHERE FullName = 'Player One';
+SELECT @StudentId2 = Id FROM Students WHERE FullName = 'Santa I Claus';
+
+INSERT INTO StudentCourses (StudentId, CourseId)
+VALUES
+	(@StudentId1, 'POT-101-23'),
+	(@StudentId1, 'POT-101-23'),
+	(@StudentId2, 'TLP-201-23')
+;

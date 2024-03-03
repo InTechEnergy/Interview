@@ -1,5 +1,6 @@
 using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Controllers.Models;
+using ExampleApp.Api.Domain;
 using ExampleApp.Api.Domain.Academia;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
