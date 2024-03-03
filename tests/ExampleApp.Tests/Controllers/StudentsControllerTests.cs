@@ -3,6 +3,8 @@ using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia.Models;
 using ExampleApp.Api.Domain.Academia.Queries;
 using ExampleApp.Api.Domain.Students;
+using ExampleApp.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ExampleApp.Tests.Controllers;
@@ -10,11 +12,13 @@ namespace ExampleApp.Tests.Controllers;
 public class StudentsControllerTests
 {
     private readonly IMediator _mediator;
+    private readonly ICourseService _courseService;
     private readonly ILogger<StudentsController> _logger = Utils.CreateLogger<StudentsController>();
 
     public StudentsControllerTests()
     {
         _mediator = Substitute.For<IMediator>();
+        _courseService = Substitute.For<ICourseService>();
     }
 
     [Fact]
@@ -31,7 +35,7 @@ public class StudentsControllerTests
             .Returns(expectedStudents);
 
         // Act
-        var response = await new StudentsController(_mediator, _logger).GetCurrent();
+        var response = await new StudentsController(_mediator, _courseService, _logger).GetCurrent();
 
         // Assert
         var students = Assert.IsAssignableFrom<IEnumerable<StudentModel>>(response);
@@ -59,10 +63,37 @@ public class StudentsControllerTests
             .Returns(expectedStudents);
 
         // Act
-        var response = await new StudentsController(_mediator, _logger).GetCurrent();
+        var response = await new StudentsController(_mediator, _courseService, _logger).GetCurrent();
 
         // Assert
         var students = Assert.IsAssignableFrom<IEnumerable<StudentModel>>(response);
         Assert.Empty(students);
+    }
+
+    [Fact]
+    public async Task Given_Empty_Course_Id_When_Assigning_Student_To_Course_Then_Returns_Bad_Request()
+    {
+        // Arrange
+        var request = new RegisterStudentToCourseModel() { CourseId = null };
+
+        // Act
+        var response = await new StudentsController(_mediator, _courseService, _logger).RegisterStudentToCourse(request);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(response);
+    }
+
+    [Fact]
+    public async Task Given_Empty_FullName_And_BadgeNumber_Id_When_Assigning_Student_To_Course_Then_Returns_Bad_Request()
+    {
+        // Arrange
+        var request = new RegisterStudentToCourseModel() { CourseId = "123" };
+
+        // Act
+        var response = await new StudentsController(_mediator, _courseService, _logger).RegisterStudentToCourse(request);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(response);
+        Assert.Equal("FullName or BadgeNumber is required.", (response as BadRequestObjectResult)!.Value);
     }
 }

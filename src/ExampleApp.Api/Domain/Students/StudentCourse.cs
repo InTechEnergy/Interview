@@ -8,6 +8,6 @@ internal class StudentCourse : Aggregate<int>
     public int StudentId { get; set; }
     public string? CourseId { get; set; }
 
-    public virtual required Student Student { get; set; }
-    public virtual required Course Course { get; set; }
+    public virtual Student? Student { get; set; }
+    public virtual Course? Course { get; set; }
 }

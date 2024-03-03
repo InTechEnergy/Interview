@@ -1,6 +1,7 @@
 ﻿using ExampleApp.Api.Controllers;
 using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain;
+using ExampleApp.Api.Services.Interfaces;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,8 +16,9 @@ public class StudentsControllerIntegrationTests : IClassFixture<DatabaseFixture>
     public StudentsControllerIntegrationTests(DatabaseFixture fixture)
     {
         var mediator = (IMediator)fixture.Services.GetService(typeof(IMediator))!;
+        var courseService = (ICourseService)fixture.Services.GetService(typeof(ICourseService))!;
         var logger = (ILogger<StudentsController>)fixture.Services.GetService(typeof(ILogger<StudentsController>))!;
-        _controller = new StudentsController(mediator, logger);
+        _controller = new StudentsController(mediator, courseService, logger);
         _db = (AcademiaDbContext)fixture.Services.GetService(typeof(AcademiaDbContext))!;
 
         Dispose();
