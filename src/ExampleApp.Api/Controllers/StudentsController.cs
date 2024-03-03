@@ -51,7 +51,7 @@ public class StudentsController : ControllerBase
 
     [Route("register-to-course")]
     [HttpPost(Name = "RegisterStudentToCourse")]
-    public async Task<IActionResult> RegisterStudentToCourse([FromBody] RegisterStudentToCourseModel request)
+    public async Task<IActionResult> RegisterStudentToCourse([FromBody] StudentToCourseEnrollmentModel request)
     {
         if (!ModelState.IsValid)
         {
@@ -63,7 +63,7 @@ public class StudentsController : ControllerBase
             return BadRequest("FullName or BadgeNumber is required.");
         }
 
-        var isCourseCurrent = await _courseService.IsCourseCurrent(request.CourseId!);
+        var isCourseCurrent = await _courseService.IsCourseCurrentAsync(request.CourseId!);
         if (!isCourseCurrent)
         {
             return BadRequest($"Course {request.CourseId} is not available.");
@@ -88,7 +88,50 @@ public class StudentsController : ControllerBase
             return BadRequest($"Student {student.Id} is already enrolled in course {request.CourseId}.");
         }
 
-        var studentCourse = await _mediator.Send(new RegisterStudentToCourseCommand(student.Id, request.CourseId));
-        return Created(nameof(RegisterStudentToCourse), studentCourse);
+        var registerResult = await _mediator.Send(new RegisterStudentToCourseCommand(student.Id, request.CourseId));
+        return Created(nameof(RegisterStudentToCourse), registerResult);
+    }
+
+    [Route("unregister-from-course")]
+    [HttpPost(Name = "UnregisterStudentToCourse")]
+    public async Task<IActionResult> UnregisterStudentToCourse([FromBody] StudentToCourseEnrollmentModel request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState.Values);
+        }
+
+        if (string.IsNullOrEmpty(request.FullName) && string.IsNullOrEmpty(request.BadgeNumber))
+        {
+            return BadRequest("FullName or BadgeNumber is required.");
+        }
+
+        var isCoursePast = await _courseService.IsCoursePastAsync(request.CourseId!);
+        if (!isCoursePast)
+        {
+            return BadRequest($"Course {request.CourseId} should be available.");
+        }
+
+        var course = await _mediator.Send(new FindCourseByIdQuery(request.CourseId));
+        if (course is null)
+        {
+            return NotFound($"Course {request.CourseId} is not found.");
+        }
+
+        var student = await _mediator.Send(new FindStudentQuery(request.FullName, request.BadgeNumber));
+        if (student is null)
+        {
+            var studentId = string.IsNullOrWhiteSpace(request.FullName) ? request.FullName : request.BadgeNumber;
+            return NotFound($"Student '{studentId}' is not found.");
+        }
+
+        bool isStudentEnrolled = await _mediator.Send(new IsStudentAssignedToCourseQuery(student.Id, request.CourseId));
+        if (isStudentEnrolled)
+        {
+            return BadRequest($"Student {student.Id} is already enrolled in course {request.CourseId}.");
+        }
+
+        var unregisterResult = await _mediator.Send(new UnregisterStudentFromCourseCommand(student.Id, request.CourseId));
+        return Created(nameof(RegisterStudentToCourse), unregisterResult);
     }
 }

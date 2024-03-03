@@ -74,7 +74,7 @@ public class StudentsControllerTests
     public async Task Given_Empty_Course_Id_When_Assigning_Student_To_Course_Then_Returns_Bad_Request()
     {
         // Arrange
-        var request = new RegisterStudentToCourseModel() { CourseId = null };
+        var request = new StudentToCourseEnrollmentModel() { CourseId = null };
 
         // Act
         var response = await new StudentsController(_mediator, _courseService, _logger).RegisterStudentToCourse(request);
@@ -87,10 +87,37 @@ public class StudentsControllerTests
     public async Task Given_Empty_FullName_And_BadgeNumber_Id_When_Assigning_Student_To_Course_Then_Returns_Bad_Request()
     {
         // Arrange
-        var request = new RegisterStudentToCourseModel() { CourseId = "123" };
+        var request = new StudentToCourseEnrollmentModel() { CourseId = "123" };
 
         // Act
         var response = await new StudentsController(_mediator, _courseService, _logger).RegisterStudentToCourse(request);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(response);
+        Assert.Equal("FullName or BadgeNumber is required.", (response as BadRequestObjectResult)!.Value);
+    }
+
+    [Fact]
+    public async Task Given_Empty_Course_Id_When_Unassigning_Student_From_Course_Then_Returns_Bad_Request()
+    {
+        // Arrange
+        var request = new StudentToCourseEnrollmentModel() { CourseId = null };
+
+        // Act
+        var response = await new StudentsController(_mediator, _courseService, _logger).UnregisterStudentToCourse(request);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(response);
+    }
+
+    [Fact]
+    public async Task Given_Empty_FullName_And_BadgeNumber_Id_When_Unassigning_Student_From_Course_Then_Returns_Bad_Request()
+    {
+        // Arrange
+        var request = new StudentToCourseEnrollmentModel() { CourseId = "123" };
+
+        // Act
+        var response = await new StudentsController(_mediator, _courseService, _logger).UnregisterStudentToCourse(request);
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(response);

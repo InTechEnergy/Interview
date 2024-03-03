@@ -16,8 +16,8 @@ internal class RegisterStudentToCourseCommandHandler : IRequestHandler<RegisterS
     {
         var studentCourse = new StudentCourse
         {
-            CourseId = request.courseId,
-            StudentId = request.studentId
+            CourseId = request.CourseId,
+            StudentId = request.StudentId
         };
 
         await _context.StudentCourses.AddAsync(studentCourse, cancellationToken);

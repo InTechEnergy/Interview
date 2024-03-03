@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ExampleApp.Api.Controllers.Models;
 
-namespace ExampleApp.Api.Controllers.Models;
-
-public class RegisterStudentToCourseModel
+public class StudentToCourseEnrollmentModel
 {
     public required string CourseId { get; set; }
 

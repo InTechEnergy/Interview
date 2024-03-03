@@ -13,10 +13,17 @@ public class CourseService : ICourseService
         _mediator = mediator;
     }
 
-    public async Task<bool> IsCourseCurrent(string courseId)
+    public async Task<bool> IsCourseCurrentAsync(string courseId)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
         var activeCourses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
+
+        return activeCourses.Any(c => c.Id == courseId);
+    }
+
+    public async Task<bool> IsCoursePastAsync(string courseId)
+    {
+        var activeCourses = await _mediator.Send(new GetPastCoursesQuery());
 
         return activeCourses.Any(c => c.Id == courseId);
     }
