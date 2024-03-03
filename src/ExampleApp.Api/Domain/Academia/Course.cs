@@ -6,14 +6,14 @@ internal class Course : AggregateRoot<string>
         string id,
         string description,
         Semester semester,
-        Professor professor,
+        Professor lecturer,
         DateTimeOffset createdOn,
         DateTimeOffset lastModifiedOn)
     {
         Id = id;
         Description = description;
         Semester = semester;
-        Professor = professor;
+        Lecturer = lecturer;
         CreatedOn = createdOn;
         LastModifiedOn = lastModifiedOn;
     }
@@ -30,11 +30,11 @@ internal class Course : AggregateRoot<string>
     }
     public string Description { get; init; }
     public Semester Semester { get; protected init; }
-    public Professor Professor { get; protected set; }
+    public Professor Lecturer { get; protected set; }
 
-    public void UpdateProfessor(Professor newProfessor)
+    public void UpdateProfessor(Professor newLecturer)
     {
-        Professor = newProfessor ?? throw new ArgumentNullException(nameof(newProfessor));
+        Lecturer = newLecturer ?? throw new ArgumentNullException(nameof(newLecturer));
         LastModifiedOn = DateTimeOffset.UtcNow;
     }
 }

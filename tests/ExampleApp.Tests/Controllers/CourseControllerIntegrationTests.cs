@@ -71,13 +71,13 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
         response.Should().BeOfType<AcceptedResult>();
 
         Course? course = await _db.Courses
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .Include(c => c.Semester)
             .FirstOrDefaultAsync(c => c.Id == "TEST-01");
 
         course.Should().NotBeNull();
-        course.Professor.FullName.Should().Be("test professor 02");
-        course.Professor.Extension.Should().Be("02");
+        course.Lecturer.FullName.Should().Be("test professor 02");
+        course.Lecturer.Extension.Should().Be("02");
     }
 
     [Fact]
@@ -101,12 +101,12 @@ DELETE FROM [example-db].dbo.Semesters WHERE Id = 'tst-01';
             .And.Be("Invalid course TEST-00");
 
         Course? course = await _db.Courses
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .Include(c => c.Semester)
             .FirstOrDefaultAsync(c => c.Id == "TEST-01");
 
         course.Should().NotBeNull();
-        course.Professor.FullName.Should().Be("test professor 01");
-        course.Professor.Extension.Should().BeNull();
+        course.Lecturer.FullName.Should().Be("test professor 01");
+        course.Lecturer.Extension.Should().BeNull();
     }
 }

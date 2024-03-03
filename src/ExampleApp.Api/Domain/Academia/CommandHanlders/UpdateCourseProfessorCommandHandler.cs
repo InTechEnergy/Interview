@@ -20,7 +20,7 @@ internal class UpdateCourseProfessorCommandHandler : IRequestHandler<UpdateCours
     public async Task<Unit> Handle(UpdateCourseProfessor request, CancellationToken cancellationToken)
     {
         var course = await _context.Courses
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .Include(c => c.Semester)
             .SingleAsync(c => c.Id == request.CourseId, cancellationToken: cancellationToken);
 
@@ -28,11 +28,11 @@ internal class UpdateCourseProfessorCommandHandler : IRequestHandler<UpdateCours
             p => p.Id == request.NewProfessorId,
             cancellationToken: cancellationToken);
 
-        if (course.Professor.Id == newProfessor.Id)
+        if (course.Lecturer.Id == newProfessor.Id)
         {
             _logger.LogInformation(
-                "Course's new professor is the same as the current (id={Id}); nothing to update",
-                course.Professor.Id);
+                "Course's new lecturer  is the same as the current (id={Id}); nothing to update",
+                course.Lecturer.Id);
             return Unit.Value;
         }
 

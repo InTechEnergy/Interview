@@ -19,7 +19,7 @@ internal class GetPastCoursesQueryHandler : IRequestHandler<GetPastCoursesQuery,
         var courses = await _context.Courses
             .Where(c => c.Semester.End < today)
             .Include(c => c.Semester)
-            .Include(c => c.Professor)
+            .Include(c => c.Lecturer)
             .ToListAsync(cancellationToken: cancellationToken);
         return courses;
     }

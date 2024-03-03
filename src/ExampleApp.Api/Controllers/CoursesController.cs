@@ -31,7 +31,7 @@ public class CoursesController : ControllerBase
             course.Id,
             course.Description,
             new KeyNameModel(course.Semester.Id, course.Semester.Description),
-            new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName)
+            new KeyNameModel(course.Lecturer.Id.ToString(), course.Lecturer.FullName)
         )).ToList();
     }
 
