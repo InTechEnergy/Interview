@@ -1,8 +1,9 @@
-using System.Security.Cryptography;
 using ExampleApp.Api.Controllers;
-using Microsoft.Extensions.Logging;
+using ExampleApp.Api.Controllers.Models;
 using ExampleApp.Api.Domain.Academia;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ExampleApp.Tests;
 
@@ -31,7 +32,7 @@ public class CoursesControllerTests
                     Start = DateOnly.FromDateTime(DateTime.Today),
                     End = DateOnly.FromDateTime(DateTime.Today)
                 },
-                new Professor { FullName = "prof one" },
+                new Professor { FullName = "prof 1" },
                 DateTimeOffset.Now,
                 DateTimeOffset.Now
             ),
@@ -43,7 +44,7 @@ public class CoursesControllerTests
                     Description = "sem-1", Start = DateOnly.FromDateTime(DateTime.Today),
                     End = DateOnly.FromDateTime(DateTime.Today)
                 },
-                new Professor { FullName = "prof one" },
+                new Professor { FullName = "prof 2" },
                 DateTimeOffset.Now,
                 DateTimeOffset.Now
             )
@@ -55,41 +56,39 @@ public class CoursesControllerTests
         var response = await new CoursesController(_mediator, _logger).GetCurrent();
 
         // Assert
-        response.Should().HaveCount(2);
-        response.Should()
+        var result = (response.Result as OkObjectResult).Value as SemesterModel;
+        Assert.NotNull(result);
+
+        result.Should()
             .BeEquivalentTo(
-                new[]
-                {
                     new
                     {
-                        Id = "test1",
-                        Description = "test 1",
-                        Semester = new
+                        Name = "sem-1",
+                        Start = DateOnly.FromDateTime(DateTime.Today),
+                        End = DateOnly.FromDateTime(DateTime.Today),
+                        Courses = new[]
                         {
-                            Key = default(string?),
-                            Name = "sem-1"
-                        },
-                        Professor = new
-                        {
-                            Key = "0",
-                            Name = "prof one"
+                            new
+                            {
+                                Key = "test1",
+                                Name = "test 1",
+                                Professor = new
+                                {
+                                    Key = "0",
+                                    Name = "prof 1"
+                                }
+                            },
+                            new
+                            {
+                                Key = "test2",
+                                Name = "test 2",
+                                Professor = new
+                                {
+                                    Key = "0",
+                                    Name = "prof 2"
+                                }
+                            }
                         }
-                    },
-                    new
-                    {
-                        Id = "test2",
-                        Description = "test 2",
-                        Semester = new
-                        {
-                            Key = default(string?),
-                            Name = "sem-1"
-                        },
-                        Professor = new
-                        {
-                            Key = "0",
-                            Name = "prof one"
-                        }
-                    }
-                });
+                    });
     }
 }

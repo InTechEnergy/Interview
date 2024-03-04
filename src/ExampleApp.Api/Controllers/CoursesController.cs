@@ -21,18 +21,22 @@ public class CoursesController : ControllerBase
     }
 
     [HttpGet(Name = "GetCurrentCourses")]
-    public async Task<IEnumerable<CourseModel>> GetCurrent()
+    public async Task<ActionResult<SemesterModel>> GetCurrent()
     {
-        DateOnly today = new(2023, 9, 1);
+        DateOnly today = new (2023, 9, 1);
         ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        return courses.Select(course => new CourseModel(
-            course.Id,
-            course.Description,
-            new KeyNameModel(course.Semester.Id, course.Semester.Description),
-            new KeyNameModel(course.Lecturer.Id.ToString(), course.Lecturer.FullName)
-        )).ToList();
+        if (!courses.Any())
+        {
+            return NotFound();
+        }
+
+        var semester = courses.First().Semester;
+        var semesterResponse = new SemesterModel(semester.Id, semester.Description, semester.Start, semester.End, courses
+            .Select(c => new CourseModel(c.Id, c.Description, new KeyNameModel(c.Lecturer.Id.ToString(), c.Lecturer.FullName)))
+            .ToList());
+        return Ok(semesterResponse);
     }
 
     [HttpPatch(Name = "UpdatesProfessor")]

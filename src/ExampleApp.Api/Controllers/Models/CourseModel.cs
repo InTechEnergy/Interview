@@ -1,3 +1,3 @@
 namespace ExampleApp.Api.Controllers.Models;
 
-public record CourseModel(string Id, string Description, KeyNameModel Semester, KeyNameModel Professor);
+public record CourseModel(string Id, string Name, KeyNameModel Professor) : KeyNameModel(Id, Name);
