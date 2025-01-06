@@ -258,7 +258,8 @@ from Visual Studio, or Azure Data Studio, or your favorite MSSQL client.
 
 ### Docker Container
 
-https://hub.docker.com/_/microsoft-azure-sql-edge
+https://hub.docker.com/r/microsoft/mssql-server
+
 Below are provided shell instructions; the link above has both Windows and Linux instructions.
 
 First create a container using the command line.
@@ -272,7 +273,7 @@ docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' \
   -e 'TZ=America/Chicago' \
   -p 1433:1433 \
   --name interview_sql \
-  -d mcr.microsoft.com/azure-sql-edge
+  -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
 Now you can connect to the dabase using `localhost`, and the `SA` user.
